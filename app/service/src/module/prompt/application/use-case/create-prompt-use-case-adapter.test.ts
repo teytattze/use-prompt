@@ -3,7 +3,7 @@ import type { ClientSession } from "mongodb";
 import { err, ok } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import { AppError } from "@/lib/app-error";
-import type { OutboxRepositoryPort } from "@/lib/outbox/port/outbound/persistence/outbox-repository-port";
+import type { OutboxEventRepositoryPort } from "@/lib/outbox/port/outbound/persistence/outbox-event-repository-port";
 import type {
   UnitOfWorkFn,
   UnitOfWorkPort,
@@ -68,7 +68,7 @@ describe("CreatePromptUseCaseAdapter", () => {
         findMany: async () => ok([]),
       };
 
-      const mockOutbox: OutboxRepositoryPort = {
+      const mockOutbox: OutboxEventRepositoryPort = {
         insertMany: async () => {
           outboxInsertCalled = true;
           return ok(undefined);
@@ -114,7 +114,7 @@ describe("CreatePromptUseCaseAdapter", () => {
         findMany: async () => ok([]),
       };
 
-      const mockOutbox: OutboxRepositoryPort = {
+      const mockOutbox: OutboxEventRepositoryPort = {
         insertMany: async (ctx) => {
           capturedOutboxCtx = ctx;
           return ok(undefined);
@@ -156,7 +156,7 @@ describe("CreatePromptUseCaseAdapter", () => {
         findMany: async () => ok([]),
       };
 
-      const mockOutbox: OutboxRepositoryPort = {
+      const mockOutbox: OutboxEventRepositoryPort = {
         insertMany: async () => {
           outboxInsertCalled = true;
           return ok(undefined);
@@ -196,7 +196,7 @@ describe("CreatePromptUseCaseAdapter", () => {
         findMany: async () => ok([]),
       };
 
-      const mockOutbox: OutboxRepositoryPort = {
+      const mockOutbox: OutboxEventRepositoryPort = {
         insertMany: async () => err(mockError),
       };
 

@@ -4,7 +4,7 @@ import type { AppError } from "@/lib/app-error";
 import type { BaseEvent } from "@/lib/domain/base-event";
 import type { BaseProps } from "@/lib/domain/base-props";
 
-export interface OutboxRepositoryPort {
+export interface OutboxEventRepositoryPort {
   insertMany(
     ctx: AppContext,
     events: BaseEvent<BaseProps>[],

@@ -7,9 +7,9 @@ import type { BaseEvent } from "@/lib/domain/base-event";
 import type { BaseProps } from "@/lib/domain/base-props";
 import type { OutboxModelMapper } from "@/lib/mapper/outbox-model-mapper";
 import type { OutboxEventMongoModel } from "@/lib/outbox/adapter/oubound/persistence/mongo/outbox-event-mongo-model";
-import type { OutboxRepositoryPort } from "@/lib/outbox/port/outbound/persistence/outbox-repository-port";
+import type { OutboxEventRepositoryPort } from "@/lib/outbox/port/outbound/persistence/outbox-event-repository-port";
 
-export class OutboxEventMongoRepositoryAdapter implements OutboxRepositoryPort {
+export class OutboxEventMongoRepositoryAdapter implements OutboxEventRepositoryPort {
   #collection: Collection<OutboxEventMongoModel>;
   #mapper: OutboxModelMapper<BaseEvent<BaseProps>, OutboxEventMongoModel>;
 
