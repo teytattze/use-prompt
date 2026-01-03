@@ -9,7 +9,15 @@ import type { OutboxEventMongoModel } from "@/lib/outbox/adapter/oubound/persist
 import { OutboxEventMongoRepositoryAdapter } from "@/lib/outbox/adapter/oubound/persistence/mongo/outbox-event-mongo-repository-adapter";
 
 describe("OutboxMongoRepositoryAdapter", () => {
-  const createMockEvent = (id: string): OutboxEventMongoModel => ({
+  const createMockDomainEvent = (id: string): BaseEvent<BaseProps> =>
+    ({
+      id: id as Id,
+      aggregateId: "aggregate-123" as Id,
+      occurredAt: new Date(),
+      props: { key: "value" },
+    }) as BaseEvent<BaseProps>;
+
+  const createMockMongoModel = (id: string): OutboxEventMongoModel => ({
     _id: id as Id,
     aggregateId: "aggregate-123" as Id,
     eventType: "TestEvent",
@@ -41,19 +49,26 @@ describe("OutboxMongoRepositoryAdapter", () => {
 
   describe("insertMany", () => {
     it("should return ok when events are inserted successfully", async () => {
-      const events = [createMockEvent("event-1"), createMockEvent("event-2")];
+      const domainEvents = [
+        createMockDomainEvent("event-1"),
+        createMockDomainEvent("event-2"),
+      ];
+      const mongoModels = [
+        createMockMongoModel("event-1"),
+        createMockMongoModel("event-2"),
+      ];
       const mockCollection = createMockCollection(async () => ({
         acknowledged: true,
         insertedIds: {},
       }));
-      const mockMapper = createMockMapper(events);
+      const mockMapper = createMockMapper(mongoModels);
       const repository = new OutboxEventMongoRepositoryAdapter(
         mockCollection,
         mockMapper,
       );
       const ctx = createMockContext();
 
-      const result = await repository.insertMany(ctx, events);
+      const result = await repository.insertMany(ctx, domainEvents);
 
       expect(result.isOk()).toBe(true);
       expect(mockCollection.insertMany).toHaveBeenCalledTimes(1);
@@ -78,12 +93,13 @@ describe("OutboxMongoRepositoryAdapter", () => {
     });
 
     it("should pass session from ctx.db.session to MongoDB", async () => {
-      const events = [createMockEvent("event-1")];
+      const domainEvents = [createMockDomainEvent("event-1")];
+      const mongoModels = [createMockMongoModel("event-1")];
       const mockCollection = createMockCollection(async () => ({
         acknowledged: true,
         insertedIds: {},
       }));
-      const mockMapper = createMockMapper(events);
+      const mockMapper = createMockMapper(mongoModels);
       const repository = new OutboxEventMongoRepositoryAdapter(
         mockCollection,
         mockMapper,
@@ -91,47 +107,49 @@ describe("OutboxMongoRepositoryAdapter", () => {
       const mockSession = {} as ClientSession;
       const ctx = createMockContext(mockSession);
 
-      await repository.insertMany(ctx, events);
+      await repository.insertMany(ctx, domainEvents);
 
-      expect(mockCollection.insertMany).toHaveBeenCalledWith(events, {
+      expect(mockCollection.insertMany).toHaveBeenCalledWith(mongoModels, {
         session: mockSession,
       });
     });
 
     it("should pass undefined session when ctx.db.session is not set", async () => {
-      const events = [createMockEvent("event-1")];
+      const domainEvents = [createMockDomainEvent("event-1")];
+      const mongoModels = [createMockMongoModel("event-1")];
       const mockCollection = createMockCollection(async () => ({
         acknowledged: true,
         insertedIds: {},
       }));
-      const mockMapper = createMockMapper(events);
+      const mockMapper = createMockMapper(mongoModels);
       const repository = new OutboxEventMongoRepositoryAdapter(
         mockCollection,
         mockMapper,
       );
       const ctx = createMockContext();
 
-      await repository.insertMany(ctx, events);
+      await repository.insertMany(ctx, domainEvents);
 
-      expect(mockCollection.insertMany).toHaveBeenCalledWith(events, {
+      expect(mockCollection.insertMany).toHaveBeenCalledWith(mongoModels, {
         session: undefined,
       });
     });
 
     it("should return error when MongoDB fails", async () => {
-      const events = [createMockEvent("event-1")];
+      const domainEvents = [createMockDomainEvent("event-1")];
+      const mongoModels = [createMockMongoModel("event-1")];
       const mockError = new Error("MongoDB connection failed");
       const mockCollection = createMockCollection(async () => {
         throw mockError;
       });
-      const mockMapper = createMockMapper(events);
+      const mockMapper = createMockMapper(mongoModels);
       const repository = new OutboxEventMongoRepositoryAdapter(
         mockCollection,
         mockMapper,
       );
       const ctx = createMockContext();
 
-      const result = await repository.insertMany(ctx, events);
+      const result = await repository.insertMany(ctx, domainEvents);
 
       expect(result.isErr()).toBe(true);
     });
