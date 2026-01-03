@@ -1,0 +1,28 @@
+{
+  "name": "@use-prompt/service",
+  "scripts": {
+    "build": "bun build src/index.ts --target bun --outdir ./dist",
+    "check-types": "tsc --noEmit --skipLibCheck",
+    "dev": "bun --watch src/index.ts",
+    "lint": "eslint",
+    "start": "NODE_ENV=production bun dist/index.js",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@elysiajs/openapi": "catalog:",
+    "elysia": "catalog:",
+    "es-toolkit": "catalog:",
+    "mongodb": "catalog:",
+    "neverthrow": "catalog:",
+    "pino": "catalog:",
+    "ulid": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@total-typescript/ts-reset": "catalog:",
+    "@use-prompt/eslint-config": "workspace:*",
+    "@use-prompt/typescript-config": "workspace:*",
+    "@types/bun": "catalog:",
+    "@types/node": "catalog:"
+  }
+}

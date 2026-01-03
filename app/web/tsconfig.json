@@ -1,0 +1,12 @@
+{
+  "exclude": ["node_modules"],
+  "extends": "@use-prompt/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "next.config.ts", "next-env.d.ts", ".next/types/**/*.ts"]
+}

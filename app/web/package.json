@@ -1,0 +1,61 @@
+{
+  "name": "@use-prompt/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "check-types": "tsc --noEmit --skipLibCheck",
+    "dev": "next dev",
+    "lint": "eslint",
+    "shadcn:add": "bunx --bun shadcn@latest add",
+    "start": "next start",
+    "test": "echo 'No test run'"
+  },
+  "dependencies": {
+    "@base-ui/react": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "axios": "catalog:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "cmdk": "catalog:",
+    "date-fns": "catalog:",
+    "embla-carousel-react": "catalog:",
+    "input-otp": "catalog:",
+    "lucide-react": "catalog:",
+    "next": "catalog:",
+    "next-themes": "catalog:",
+    "react": "catalog:",
+    "react-day-picker": "catalog:",
+    "react-dom": "catalog:",
+    "react-resizable-panels": "catalog:",
+    "recharts": "catalog:",
+    "shadcn": "catalog:",
+    "sonner": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tw-animate-css": "catalog:",
+    "vaul": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "catalog:",
+    "@tanstack/react-query-devtools": "catalog:",
+    "@total-typescript/ts-reset": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@use-prompt/eslint-config": "workspace:*",
+    "@use-prompt/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
+  },
+  "ignoreScripts": [
+    "sharp",
+    "unrs-resolver"
+  ],
+  "trustedDependencies": [
+    "sharp",
+    "unrs-resolver"
+  ]
+}

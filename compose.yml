@@ -1,0 +1,16 @@
+name: use-open-prompt
+
+services:
+  mongo:
+    image: mongo:8.2.3-noble
+    container_name: use-open-prompt-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
