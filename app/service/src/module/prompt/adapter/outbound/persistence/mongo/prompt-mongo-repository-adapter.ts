@@ -1,4 +1,5 @@
 import { attemptAsync, isNil } from "es-toolkit";
+import { get } from "es-toolkit/compat";
 import type { Collection } from "mongodb";
 import { type Result, err, ok } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
@@ -21,24 +22,35 @@ export class PromptMongoRepository implements PromptRepositoryPort {
   }
 
   async insertOne(
-    _: AppContext,
+    ctx: AppContext,
     data: PromptAggregate,
   ): Promise<Result<PromptAggregate, AppError>> {
     const model = this.#mapper.fromDomain(data);
+
     const [error] = await attemptAsync(
-      async () => await this.#collection.insertOne(model),
+      async () =>
+        await this.#collection.insertOne(model, { session: ctx.db.session }),
     );
-    return !isNil(error) ? err(AppError.from(error)) : ok(data);
+
+    return isNil(error)
+      ? ok(data)
+      : err(AppError.from(error, { message: get(error, "message") }));
   }
 
-  async findMany(_: AppContext): Promise<Result<PromptAggregate[], AppError>> {
+  async findMany(
+    ctx: AppContext,
+  ): Promise<Result<PromptAggregate[], AppError>> {
     const [error, documents] = await attemptAsync(
-      async () => await this.#collection.find({}).toArray(),
+      async () =>
+        await this.#collection.find({}, { session: ctx.db.session }).toArray(),
     );
-    if (!isNil(error) || isNil(documents)) {
-      return err(AppError.from(error));
+
+    if (!isNil(error)) {
+      return err(AppError.from(error, { message: get(error, "message") }));
     }
-    const aggregates = documents.map((doc) => this.#mapper.toDomain(doc));
+    const aggregates =
+      documents?.map((doc) => this.#mapper.toDomain(doc)) ?? [];
+
     return ok(aggregates);
   }
 }

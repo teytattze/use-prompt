@@ -2,6 +2,8 @@ import { type Result, err } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import type { AppError } from "@/lib/app-error";
 import type { UseCaseDtoMapper } from "@/lib/mapper/use-case-dto-mapper";
+import type { OutboxRepositoryPort } from "@/lib/outbox/port/outbound/persistence/outbox-repository-port";
+import type { UnitOfWorkPort } from "@/lib/unit-of-work/port/unit-of-work-port";
 import { PromptAggregate } from "@/module/prompt/domain/aggregate/prompt-aggregate";
 import type {
   CreatePromptUseCaseDto,
@@ -13,32 +15,48 @@ import type { PromptRepositoryPort } from "@/module/prompt/port/outbound/persist
 export class CreatePromptUseCaseAdapter implements CreatePromptUseCasePort {
   #promptDtoMapper: UseCaseDtoMapper<PromptAggregate, PromptUseCaseDto>;
   #promptRepositoryPort: PromptRepositoryPort;
+  #unitOfWork: UnitOfWorkPort;
+  #outboxRepository: OutboxRepositoryPort;
 
   constructor(
     promptDtoMapper: UseCaseDtoMapper<PromptAggregate, PromptUseCaseDto>,
     promptRepositoryPort: PromptRepositoryPort,
+    unitOfWork: UnitOfWorkPort,
+    outboxRepository: OutboxRepositoryPort,
   ) {
     this.#promptDtoMapper = promptDtoMapper;
     this.#promptRepositoryPort = promptRepositoryPort;
+    this.#unitOfWork = unitOfWork;
+    this.#outboxRepository = outboxRepository;
   }
 
   async execute(
     ctx: AppContext,
     input: CreatePromptUseCaseDto,
   ): Promise<Result<PromptUseCaseDto, AppError>> {
-    const promptAggregate = PromptAggregate.new({
-      title: input.title,
-      messages: input.messages,
+    return this.#unitOfWork.execute(ctx, async (ctx) => {
+      const promptAggregate = PromptAggregate.new({
+        title: input.title,
+        messages: input.messages,
+      });
+
+      const saveResult = await this.#promptRepositoryPort.insertOne(
+        ctx,
+        promptAggregate,
+      );
+
+      if (saveResult.isErr()) {
+        return err(saveResult.error);
+      }
+      const outboxResult = await this.#outboxRepository.insertMany(
+        ctx,
+        promptAggregate.pullEvents(),
+      );
+
+      if (outboxResult.isErr()) {
+        return err(outboxResult.error);
+      }
+      return saveResult.map(this.#promptDtoMapper.toDto);
     });
-
-    const result = await this.#promptRepositoryPort.insertOne(
-      ctx,
-      promptAggregate,
-    );
-
-    if (result.isErr()) {
-      return err(result.error);
-    }
-    return result.map(this.#promptDtoMapper.toDto);
   }
 }

@@ -1,7 +1,8 @@
 {
   "name": "@use-prompt/service",
+  "type": "module",
   "scripts": {
-    "build": "bun build src/index.ts --target bun --outdir ./dist",
+    "build": "bun build src/index.ts --outdir ./dist --target bun",
     "check-types": "tsc --noEmit --skipLibCheck",
     "dev": "bun --watch src/index.ts",
     "lint": "eslint",

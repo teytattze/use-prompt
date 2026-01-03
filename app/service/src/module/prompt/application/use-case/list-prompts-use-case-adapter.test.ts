@@ -10,6 +10,7 @@ describe("ListPromptsUseCaseAdapter", () => {
   const mockCtx = {
     config: {},
     logger: { info: () => {}, error: () => {} },
+    db: {},
   } as unknown as AppContext;
 
   const createMockAggregate = (

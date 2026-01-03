@@ -8,4 +8,14 @@ export class BaseAggregate<T extends BaseProps> extends BaseEntity<T> {
   addEvent(event: BaseEvent<BaseProps>) {
     this.#events.push(event);
   }
+
+  pullEvents(): BaseEvent<BaseProps>[] {
+    const events = [...this.#events];
+    this.#events = [];
+    return events;
+  }
+
+  get hasEvents(): boolean {
+    return this.#events.length > 0;
+  }
 }

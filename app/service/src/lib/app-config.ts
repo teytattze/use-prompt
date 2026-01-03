@@ -8,18 +8,20 @@ export const appConfigSchema = z.object({
 
   mongo: z.object({
     uri: z.string(),
+    transactionTimeoutMs: z.number().min(1000).max(60000).default(30000),
   }),
 });
 
 export type AppConfig = z.output<typeof appConfigSchema>;
 
-export const appConfig = appConfigSchema.decode({
+export const appConfig = appConfigSchema.parse({
   app: {
-    env: "local",
-    version: "0.0.0",
+    env: process.env.APP_ENV ?? "local",
+    version: process.env.APP_VERSION ?? "0.0.0",
   },
 
   mongo: {
-    uri: "mongodb://root:password@localhost:27017",
+    uri: process.env.MONGO_URI,
+    transactionTimeoutMs: process.env.MONGO_TRANSACTION_TIMEOUT_MS ?? 30000,
   },
 });

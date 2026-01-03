@@ -25,5 +25,11 @@
       "cache": false,
       "persistent": true
     }
-  }
+  },
+  "globalEnv": [
+    "APP_ENV",
+    "APP_VERSION",
+    "MONGO_URI",
+    "MONGO_TRANSACTION_TIMEOUT_MS"
+  ]
 }
