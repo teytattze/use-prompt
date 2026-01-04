@@ -18,11 +18,11 @@ Using the research report, produce a comprehensive plan with pseudocode that an 
 
 ### Feature Requirements
 
-@task/feature/$1/FEATURE.md
+@context/FEATURE.md
 
 ### Research Report
 
-@task/feature/$1/RESEARCH_REPORT.md
+@context/RESEARCH_REPORT.md
 
 ## Instructions
 
@@ -50,11 +50,11 @@ The plan should be specific enough that:
 
 ### Template
 
-@task/template/IMPLEMENTATION_PLAN_TEMPLATE.md
+@context/template/IMPLEMENTATION_PLAN_TEMPLATE.md
 
 ### Save As (Location)
 
-@task/feature/$1/IMPLEMENTATION_PLAN.md
+@context/IMPLEMENTATION_PLAN.md
 
 ---
 
