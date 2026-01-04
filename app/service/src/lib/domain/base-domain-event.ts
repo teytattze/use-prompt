@@ -1,16 +1,19 @@
 import type { BaseProps } from "@/lib/domain/base-props";
 import { type Id, newId } from "@/lib/id";
 
-export class BaseEvent<T extends BaseProps> {
+export class BaseDomainEvent<T extends BaseProps = BaseProps> {
   id: Id;
   aggregateId: Id;
-  occurredAt: Date;
+  name: string;
+  createdAt: Date;
+
   props: T;
 
-  constructor(aggregateId: Id, props: T) {
+  constructor(aggregateId: Id, name: string, props: T) {
     this.id = newId();
     this.aggregateId = aggregateId;
-    this.occurredAt = new Date();
+    this.name = name;
+    this.createdAt = new Date();
     this.props = props;
   }
 }

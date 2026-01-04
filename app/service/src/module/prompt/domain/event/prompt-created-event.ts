@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { BaseEvent } from "@/lib/domain/base-event";
+import { BaseDomainEvent } from "@/lib/domain/base-domain-event";
 import { promptAggregatePropsSchema } from "@/module/prompt/domain/aggregate/prompt-aggregate-props";
 
 const promptCreatedEventPropsSchema = z.object({
@@ -8,4 +8,4 @@ const promptCreatedEventPropsSchema = z.object({
 });
 type PromptCreatedEventProps = z.output<typeof promptCreatedEventPropsSchema>;
 
-export class PromptCreatedEvent extends BaseEvent<PromptCreatedEventProps> {}
+export class PromptCreatedEvent extends BaseDomainEvent<PromptCreatedEventProps> {}

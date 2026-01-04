@@ -2,7 +2,6 @@ import { type Result, err } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import type { AppError } from "@/lib/app-error";
 import type { UseCaseDtoMapper } from "@/lib/mapper/use-case-dto-mapper";
-import type { OutboxEventRepositoryPort } from "@/lib/outbox/port/outbound/persistence/outbox-event-repository-port";
 import type { UnitOfWorkPort } from "@/lib/unit-of-work/port/unit-of-work-port";
 import { PromptAggregate } from "@/module/prompt/domain/aggregate/prompt-aggregate";
 import type {
@@ -16,18 +15,15 @@ export class CreatePromptUseCaseAdapter implements CreatePromptUseCasePort {
   #promptDtoMapper: UseCaseDtoMapper<PromptAggregate, PromptUseCaseDto>;
   #promptRepositoryPort: PromptRepositoryPort;
   #unitOfWork: UnitOfWorkPort;
-  #outboxRepository: OutboxEventRepositoryPort;
 
   constructor(
     promptDtoMapper: UseCaseDtoMapper<PromptAggregate, PromptUseCaseDto>,
     promptRepositoryPort: PromptRepositoryPort,
     unitOfWork: UnitOfWorkPort,
-    outboxRepository: OutboxEventRepositoryPort,
   ) {
     this.#promptDtoMapper = promptDtoMapper;
     this.#promptRepositoryPort = promptRepositoryPort;
     this.#unitOfWork = unitOfWork;
-    this.#outboxRepository = outboxRepository;
   }
 
   async execute(
@@ -48,14 +44,8 @@ export class CreatePromptUseCaseAdapter implements CreatePromptUseCasePort {
       if (saveResult.isErr()) {
         return err(saveResult.error);
       }
-      const outboxResult = await this.#outboxRepository.insertMany(
-        ctx,
-        promptAggregate.pullEvents(),
-      );
+      // TODO: publish all events with ctx using in-memory
 
-      if (outboxResult.isErr()) {
-        return err(outboxResult.error);
-      }
       return saveResult.map(this.#promptDtoMapper.toDto);
     });
   }

@@ -1,7 +1,7 @@
 import type { BaseProps } from "@/lib/domain/base-props";
 import { type Id } from "@/lib/id";
 
-export class BaseEntity<T extends BaseProps> {
+export class BaseDomainEntity<T extends BaseProps = BaseProps> {
   id: Id;
   props: T;
 

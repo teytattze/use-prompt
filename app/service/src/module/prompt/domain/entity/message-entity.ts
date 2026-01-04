@@ -1,4 +1,4 @@
-import { BaseEntity } from "@/lib/domain/base-entity";
+import { BaseDomainEntity } from "@/lib/domain/base-domain-entity";
 import { type IdInput, idSchema, newId } from "@/lib/id";
 import {
   type MessageEntityProps,
@@ -6,7 +6,7 @@ import {
   messageEntityPropsSchema,
 } from "@/module/prompt/domain/entity/message-entity-props";
 
-export class MessageEntity extends BaseEntity<MessageEntityProps> {
+export class MessageEntity extends BaseDomainEntity<MessageEntityProps> {
   constructor(id: IdInput, props: MessageEntityPropsInput) {
     super(idSchema.parse(id), messageEntityPropsSchema.parse(props));
   }

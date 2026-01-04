@@ -1,4 +1,4 @@
-import { BaseAggregate } from "@/lib/domain/base-aggregate";
+import { BaseDomainAggregate } from "@/lib/domain/base-domain-aggregate";
 import { type IdInput, idSchema, newId } from "@/lib/id";
 import {
   type PromptAggregateProps,
@@ -7,17 +7,21 @@ import {
 } from "@/module/prompt/domain/aggregate/prompt-aggregate-props";
 import { PromptCreatedEvent } from "@/module/prompt/domain/event/prompt-created-event";
 
-export class PromptAggregate extends BaseAggregate<PromptAggregateProps> {
+export class PromptAggregate extends BaseDomainAggregate<PromptAggregateProps> {
   constructor(id: IdInput, props: PromptAggregatePropsInput) {
     super(idSchema.parse(id), promptAggregatePropsSchema.parse(props));
   }
 
   static new(props: PromptAggregatePropsInput): PromptAggregate {
     const aggregate = new PromptAggregate(newId(), props);
-    const event = new PromptCreatedEvent(aggregate.id, {
-      title: aggregate.props.title,
-      messages: aggregate.props.messages,
-    });
+    const event = new PromptCreatedEvent(
+      aggregate.id,
+      PromptCreatedEvent.name,
+      {
+        title: aggregate.props.title,
+        messages: aggregate.props.messages,
+      },
+    );
     aggregate.addEvent(event);
     return aggregate;
   }
