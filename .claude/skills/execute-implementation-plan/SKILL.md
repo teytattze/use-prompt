@@ -13,7 +13,7 @@ This skill implements features by translating approved implementation plans into
 
 - User has an approved implementation plan ready for execution
 - User mentions "implement", "execute", or "build" in context of a planned feature
-- User explicitly invokes `/execute-implementation-plan {feature-name}`
+- User explicitly invokes `/execute-implementation-plan`
 - Implementation plan exists and user wants to proceed to coding
 
 ## Pipeline Context
@@ -30,10 +30,9 @@ The implementation plan has been reviewed and approved—your job is to translat
 
 The skill requires:
 
-- A feature name/identifier (e.g., `setup-message-entity`)
-- A `FEATURE.md` file at `task/feature/{feature-name}/FEATURE.md` describing the requirements
-- A `RESEARCH_REPORT.md` file at `task/feature/{feature-name}/RESEARCH_REPORT.md` from the research phase
-- An `IMPLEMENTATION_PLAN.md` file at `task/feature/{feature-name}/IMPLEMENTATION_PLAN.md` from the planning phase
+- A `FEATURE.md` file at `@context/FEATURE.md` describing the requirements
+- A `RESEARCH_REPORT.md` file at `@context/RESEARCH_REPORT.md` from the research phase
+- An `IMPLEMENTATION_PLAN.md` file at `@context/IMPLEMENTATION_PLAN.md` from the planning phase
 
 ## Implementation Process
 
@@ -99,11 +98,11 @@ If you encounter a blocker:
 
 ### Summary Location
 
-Save the implementation summary to: `task/feature/{feature-name}/IMPLEMENTATION_SUMMARY.md`
+Save the implementation summary to: `@context/IMPLEMENTATION_SUMMARY.md`
 
 ### Summary Template
 
-Use the template at: `task/template/IMPLEMENTATION_SUMMARY_TEMPLATE.md`
+Use the template at: `@context/template/IMPLEMENTATION_SUMMARY_TEMPLATE.md`
 
 ## Guidelines
 

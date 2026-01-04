@@ -13,7 +13,7 @@ This skill creates comprehensive implementation plans that guide engineers throu
 
 - User has completed research and needs an implementation plan
 - User mentions "plan", "design", or "blueprint" in context of a feature
-- User explicitly invokes `/make-implementation-plan {feature-name}`
+- User explicitly invokes `/make-implementation-plan`
 - Research report exists and user wants to proceed to planning
 
 ## Pipeline Context
@@ -30,9 +30,8 @@ The implementation plan produced here enables mechanical code implementation in 
 
 The skill requires:
 
-- A feature name/identifier (e.g., `setup-message-entity`)
-- A `FEATURE.md` file at `task/feature/{feature-name}/FEATURE.md` describing the requirements
-- A `RESEARCH_REPORT.md` file at `task/feature/{feature-name}/RESEARCH_REPORT.md` from the research phase
+- A `FEATURE.md` file at `@context/FEATURE.md` describing the requirements
+- A `RESEARCH_REPORT.md` file at `@context/RESEARCH_REPORT.md` from the research phase
 
 ## Planning Process
 
@@ -105,11 +104,11 @@ Recommend implementation order:
 
 ### Plan Location
 
-Save the plan to: `task/feature/{feature-name}/IMPLEMENTATION_PLAN.md`
+Save the plan to: `@context/IMPLEMENTATION_PLAN.md`
 
 ### Plan Template
 
-Use the template at: `task/template/IMPLEMENTATION_PLAN_TEMPLATE.md`
+Use the template at: `@context/template/IMPLEMENTATION_PLAN_TEMPLATE.md`
 
 ## Guidelines
 

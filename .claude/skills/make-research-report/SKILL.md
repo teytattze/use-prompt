@@ -14,7 +14,7 @@ This skill enables autonomous codebase exploration to produce research reports t
 - User wants to understand the codebase before implementing a feature
 - User mentions "research", "explore", or "analyze" in context of a new feature
 - User is starting a new feature and needs context discovery
-- User explicitly invokes `/make-research-report {feature-name}`
+- User explicitly invokes `/make-research-report`
 
 ## Pipeline Context
 
@@ -30,8 +30,7 @@ The research report produced here enables detailed implementation design in the 
 
 The skill requires:
 
-- A feature name/identifier (e.g., `setup-message-entity`)
-- A `FEATURE.md` file at `task/feature/{feature-name}/FEATURE.md` describing the requirements
+- A `FEATURE.md` file at `@context/FEATURE.md` describing the requirements
 
 ## Discovery Process
 
@@ -93,11 +92,11 @@ Note any limitations or requirements:
 
 ### Report Location
 
-Save the report to: `task/feature/{feature-name}/RESEARCH_REPORT.md`
+Save the report to: `@context/RESEARCH_REPORT.md`
 
 ### Report Template
 
-Use the template at: `task/template/RESEARCH_REPORT_TEMPLATE.md`
+Use the template at: `@context/template/RESEARCH_REPORT_TEMPLATE.md`
 
 ## Guidelines
 

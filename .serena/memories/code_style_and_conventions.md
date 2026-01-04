@@ -29,16 +29,19 @@
 
 ### Files
 
-- **kebab-case** for all file names (e.g., `prompt-router-factory.ts`, `http-client.ts`)
-- Suffix patterns:
-  - `-adapter.ts` for adapter implementations
-  - `-port.ts` for port interfaces
-  - `-dto.ts` for data transfer objects
-  - `-mapper.ts` for mappers
-  - `-use-case.ts` for use cases
-  - `-aggregate.ts` for domain aggregates
-  - `-event.ts` for domain events
-  - `-model.ts` for persistence models
+- **kebab-case** for all file names (e.g., `prompt.router.ts`, `http-client.ts`)
+- Naming patterns use dot-notation:
+  - `{name}.aggregate.ts` for domain aggregates (e.g., `prompt.aggregate.ts`)
+  - `{name}.entity.ts` for domain entities (e.g., `message.entity.ts`)
+  - `{name}.event.ts` for domain events (e.g., `prompt-created.event.ts`)
+  - `{name}.port.ts` for port interfaces (e.g., `prompt-repository.port.ts`)
+  - `{name}.use-case.ts` for use cases (e.g., `create-prompt.use-case.ts`)
+  - `{name}.handler.ts` for event handlers (e.g., `prompt-created.handler.ts`)
+  - `{name}.repository.ts` for repository adapters (e.g., `prompt-mongo.repository.ts`)
+  - `{name}.mapper.ts` for mappers (e.g., `prompt-dto.mapper.ts`)
+  - `{name}.dto.ts` for data transfer objects (e.g., `prompt.dto.ts`)
+  - `{name}.router.ts` for HTTP routers (e.g., `prompt.router.ts`)
+  - `{name}.props.ts` for entity/aggregate props types (e.g., `prompt.props.ts`)
 
 ### Code
 
@@ -48,12 +51,14 @@
 
 ## Architecture Patterns
 
-### Backend (Hexagonal Architecture)
+### Backend (DDD + Hexagonal Architecture)
 
-- **Ports**: Define interfaces for inbound (use cases) and outbound (repositories)
-- **Adapters**: Implement ports (HTTP controllers, MongoDB repositories)
-- **Application**: Use case implementations and mappers
-- **Domain**: Aggregates, entities, value objects, and domain events
+- **Domain Layer** (`module/*/domain/`): Aggregates, entities, value objects, and domain events
+- **Application Layer** (`module/*/application/`): Use cases, event handlers, DTOs, and mappers
+- **Port Layer** (`module/*/port/`): Interfaces for use cases and repositories
+- **Infrastructure Layer** (`module/*/infra/`): Adapters (HTTP routers, MongoDB repositories)
+- **Shared Kernel** (`shared/`): Cross-cutting concerns (base classes, core utilities)
+- **Composition** (`composition/`): Manual dependency injection wiring
 
 ### Frontend
 
@@ -64,7 +69,7 @@
 ## Error Handling
 
 - Backend uses `neverthrow` for Result types (functional error handling)
-- Define custom error types in `lib/app-error.ts`
+- Define custom error types in `shared/core/app-error.ts`
 
 ## ID Generation
 

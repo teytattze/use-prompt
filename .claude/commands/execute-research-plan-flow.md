@@ -4,7 +4,7 @@ Orchestrate a sequential workflow of research → plan for a feature.
 
 ## Input
 
-- `$ARGUMENTS` - The feature name to pass to each sub-agent
+- Feature requirements must be defined in `@context/FEATURE.md`
 
 ## Workflow Execution
 
@@ -15,7 +15,7 @@ Execute the following steps **sequentially**. Each step must complete successful
 Spawn a `research-report-generator` sub-agent to perform research:
 
 ```
-/make-research-report $ARGUMENTS
+/make-research-report
 ```
 
 Wait for completion. If the agent fails or reports an error, stop the workflow and report the failure.
@@ -25,7 +25,7 @@ Wait for completion. If the agent fails or reports an error, stop the workflow a
 After research completes successfully, spawn a `implementation-planner` sub-agent to create the implementation plan:
 
 ```
-/make-implementation-plan $ARGUMENTS
+/make-implementation-plan
 ```
 
 Wait for completion. If the agent fails or reports an error, stop the workflow and report the failure.
@@ -35,3 +35,4 @@ Wait for completion. If the agent fails or reports an error, stop the workflow a
 - Each sub-agent starts with a fresh context
 - Do not proceed to the next step until the current step completes successfully
 - If any step fails, immediately stop and report which step failed and why
+- All artifacts are read from and written to `@context/`
