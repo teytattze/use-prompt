@@ -18,7 +18,7 @@ Autonomously explore the codebase and produce a concise research report that ide
 
 ### Feature Requirements
 
-@task/feature/$1/FEATURE.md
+@context/FEATURE.md
 
 ## Instructions
 
@@ -46,11 +46,11 @@ Explore the codebase systematically to understand everything needed to implement
 
 ### Template
 
-@task/template/RESEARCH_REPORT_TEMPLATE.md
+@context/template/RESEARCH_REPORT_TEMPLATE.md
 
 ### Save As (Location)
 
-@task/feature/$1/RESEARCH_REPORT.md
+@context/RESEARCH_REPORT.md
 
 ---
 

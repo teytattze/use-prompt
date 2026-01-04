@@ -18,15 +18,15 @@ Using the approved implementation plan, produce working code that implements the
 
 ### Feature Requirements
 
-@task/feature/$1/FEATURE.md
+@context/FEATURE.md
 
 ### Research Report
 
-@task/feature/$1/RESEARCH_REPORT.md
+@context/RESEARCH_REPORT.md
 
 ### Approved Plan
 
-@task/feature/$1/IMPLEMENTATION_PLAN.md
+@context/IMPLEMENTATION_PLAN.md
 
 ## Instructions
 
@@ -82,11 +82,11 @@ If you encounter a blocker:
 
 ### Template
 
-@task/template/IMPLEMENTATION_SUMMARY_TEMPLATE.md
+@context/template/IMPLEMENTATION_SUMMARY_TEMPLATE.md
 
 ### Save As (Location)
 
-@task/feature/$1/IMPLEMENTATION_SUMMARY.md
+@context/IMPLEMENTATION_SUMMARY.md
 
 ---
 
