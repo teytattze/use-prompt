@@ -1,6 +1,3 @@
-import axios from "axios";
+import type { AxiosInstance } from "axios";
 
-export const httpClient = axios.create({
-  baseURL: "",
-  timeout: 10 * 1000,
-});
+export type HttpClient = AxiosInstance;
