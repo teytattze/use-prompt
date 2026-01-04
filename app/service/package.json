@@ -24,6 +24,7 @@
     "@use-prompt/eslint-config": "workspace:*",
     "@use-prompt/typescript-config": "workspace:*",
     "@types/bun": "catalog:",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "eslint": "catalog:"
   }
 }

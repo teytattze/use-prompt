@@ -7,7 +7,7 @@ import type { ListPromptsUseCasePort } from "@/module/prompt/port/inbound/use-ca
 import type { PromptUseCaseDto } from "@/module/prompt/port/inbound/use-case/prompt-use-case-dto";
 import type { PromptRepositoryPort } from "@/module/prompt/port/outbound/persistence/prompt-repository-port";
 
-export class ListPromptsUseCaseAdapter implements ListPromptsUseCasePort {
+export class ListPromptsUseCase implements ListPromptsUseCasePort {
   #promptDtoMapper: UseCaseDtoMapper<PromptAggregate, PromptUseCaseDto>;
   #promptRepositoryPort: PromptRepositoryPort;
 

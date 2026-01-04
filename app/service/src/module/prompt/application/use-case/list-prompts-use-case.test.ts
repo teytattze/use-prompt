@@ -4,7 +4,7 @@ import type { AppContext } from "@/lib/app-context";
 import { AppError } from "@/lib/app-error";
 import type { PromptAggregate } from "@/module/prompt/domain/aggregate/prompt-aggregate";
 import type { PromptRepositoryPort } from "@/module/prompt/port/outbound/persistence/prompt-repository-port";
-import { ListPromptsUseCaseAdapter } from "./list-prompts-use-case-adapter";
+import { ListPromptsUseCase } from "./list-prompts-use-case";
 
 describe("ListPromptsUseCaseAdapter", () => {
   const mockCtx = {
@@ -48,7 +48,7 @@ describe("ListPromptsUseCaseAdapter", () => {
         findMany: async () => ok([aggregate1, aggregate2]),
       };
 
-      const useCase = new ListPromptsUseCaseAdapter(mockMapper, mockRepository);
+      const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
       const result = await useCase.execute(mockCtx, undefined);
 
       expect(result.isOk()).toBe(true);
@@ -67,7 +67,7 @@ describe("ListPromptsUseCaseAdapter", () => {
         findMany: async () => ok([]),
       };
 
-      const useCase = new ListPromptsUseCaseAdapter(mockMapper, mockRepository);
+      const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
       const result = await useCase.execute(mockCtx, undefined);
 
       expect(result.isOk()).toBe(true);
@@ -83,7 +83,7 @@ describe("ListPromptsUseCaseAdapter", () => {
         findMany: async () => err(mockError),
       };
 
-      const useCase = new ListPromptsUseCaseAdapter(mockMapper, mockRepository);
+      const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
       const result = await useCase.execute(mockCtx, undefined);
 
       expect(result.isErr()).toBe(true);
