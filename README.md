@@ -1,135 +1,96 @@
-# Turborepo starter
+# use-prompt
 
-This Turborepo starter is maintained by the Turborepo core team.
+A monorepo for prompt management built with Bun, Turborepo, and modern web technologies.
 
-## Using this example
+## Tech Stack
 
-Run the following command:
+- **Runtime:** [Bun](https://bun.sh) v1.3.5
+- **Monorepo:** [Turborepo](https://turborepo.com)
+- **Backend:** [Elysia](https://elysiajs.com) + MongoDB (DDD + Hexagonal Architecture)
+- **Frontend:** [Next.js](https://nextjs.org) + React + TailwindCSS
 
-```sh
-npx create-turbo@latest
+## Quick Start
+
+```bash
+# Install dependencies
+bun install
+
+# Start MongoDB
+docker compose -f compose.yml up -d
+
+# Start development servers
+bun run dev
 ```
 
-## What's inside?
+## Apps and Packages
 
-This Turborepo includes the following packages/apps:
+| Package              | Description                          |
+| -------------------- | ------------------------------------ |
+| `app/service`        | Backend API (Elysia + MongoDB)       |
+| `app/web`            | Frontend (Next.js + React)           |
+| `packages/eslint-config` | Shared ESLint configuration      |
+| `packages/typescript-config` | Shared TypeScript configuration |
 
-### Apps and Packages
+## Commands
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+| Command               | Description                          |
+| --------------------- | ------------------------------------ |
+| `bun install`         | Install dependencies                 |
+| `bun run dev`         | Start all apps in development mode   |
+| `bun run build`       | Build all apps for production        |
+| `bun run check-types` | Run TypeScript type checking         |
+| `bun run lint`        | Run ESLint                           |
+| `bun run test`        | Run tests                            |
+| `bun run format`      | Format code with Prettier            |
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Target Specific Apps
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+bun run dev --filter ./app/service   # Backend only
+bun run dev --filter ./app/web       # Frontend only
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Architecture
+
+The backend follows **DDD (Domain-Driven Design)** with **Hexagonal Architecture**:
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+app/service/src/
+├── api.ts              # HTTP entry point
+├── worker.ts           # Background worker entry point
+├── shared/             # Shared kernel
+├── infra/              # Infrastructure adapters
+├── module/             # Feature modules (bounded contexts)
+└── composition/        # Dependency injection
 ```
 
-### Develop
+See [CLAUDE.md](./CLAUDE.md) for detailed architecture documentation.
 
-To develop all apps and packages, run the following command:
+## Development
 
-```
-cd my-turborepo
+### Prerequisites
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+- [Bun](https://bun.sh) v1.3.5+
+- [Docker](https://docker.com) (for MongoDB)
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+### Environment Variables
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Create `.env` files as needed:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+# app/service/.env
+APP_ENV=local
+MONGO_URI=mongodb://root:password@localhost:27017/
 ```
 
-### Remote Caching
+### Database
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+```bash
+# Start MongoDB
+docker compose -f compose.yml up -d
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# Stop MongoDB
+docker compose -f compose.yml down
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+MongoDB runs at `localhost:27017` with credentials `root:password`.

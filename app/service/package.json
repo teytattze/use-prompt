@@ -2,11 +2,13 @@
   "name": "@use-prompt/service",
   "type": "module",
   "scripts": {
-    "build": "bun build src/index.ts --outdir ./dist --target bun",
+    "build": "bun build src/api.ts --outdir ./dist --target bun",
     "check-types": "tsc --noEmit --skipLibCheck",
-    "dev": "bun --watch src/index.ts",
+    "dev": "bun --watch src/api.ts",
+    "dev:worker": "bun --watch src/worker.ts",
     "lint": "eslint",
-    "start": "NODE_ENV=production bun dist/index.js",
+    "start": "NODE_ENV=production bun dist/api.js",
+    "start:worker": "NODE_ENV=production bun src/worker.ts",
     "test": "bun test"
   },
   "dependencies": {
