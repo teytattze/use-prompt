@@ -15,6 +15,7 @@
     "@elysiajs/openapi": "catalog:",
     "elysia": "catalog:",
     "es-toolkit": "catalog:",
+    "jose": "catalog:",
     "mongodb": "catalog:",
     "neverthrow": "catalog:",
     "pino": "catalog:",

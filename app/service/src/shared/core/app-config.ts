@@ -10,6 +10,15 @@ export const appConfigSchema = z.object({
     uri: z.string().default("mongodb://localhost:27017/"),
     transactionTimeoutMs: z.coerce.number().min(1000).max(60000).default(30000),
   }),
+
+  clerk: z.object({
+    jwksUrl: z
+      .string()
+      .default(
+        "https://united-raptor-76.clerk.accounts.dev/.well-known/jwks.json",
+      ),
+    issuer: z.string().default("https://united-raptor-76.clerk.accounts.dev"),
+  }),
 });
 
 export type AppConfig = z.output<typeof appConfigSchema>;
@@ -23,5 +32,10 @@ export const appConfig = appConfigSchema.parse({
   mongo: {
     uri: process.env.MONGO_URI,
     transactionTimeoutMs: process.env.MONGO_TRANSACTION_TIMEOUT_MS,
+  },
+
+  clerk: {
+    jwksUrl: process.env.CLERK_JWKS_URL,
+    issuer: process.env.CLERK_ISSUER,
   },
 });

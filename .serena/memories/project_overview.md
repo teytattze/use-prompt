@@ -39,33 +39,65 @@ A monorepo project for managing and sharing prompts. The project provides a web 
 
 ## Architecture
 
-### Backend Service - Hexagonal/Clean Architecture
+### Backend Service - DDD + Hexagonal Architecture
 
-The service follows hexagonal (ports & adapters) architecture:
-
-```
-src/module/prompt/
-├── adapter/
-│   ├── inbound/http/      # HTTP routers and API
-│   └── outbound/persistence/mongo/  # MongoDB repository
-├── application/
-│   ├── use-case/          # Use case implementations
-│   └── mapper/            # DTO mappers
-├── port/
-│   ├── inbound/use-case/  # Use case interfaces
-│   └── outbound/persistence/  # Repository interfaces
-└── domain/
-    ├── aggregate/         # Domain aggregates
-    └── event/             # Domain events
-```
-
-### Frontend - Feature-based Structure
+The service follows **Domain-Driven Design** with **Hexagonal Architecture** (Ports & Adapters):
 
 ```
 src/
-├── app/              # Next.js app router pages
-├── component/ui/     # Reusable UI components (shadcn)
-├── feature/          # Feature-specific components
-├── lib/              # Utilities and helpers
-└── service/          # API service layer
+├── api.ts                    # HTTP server entry point
+├── worker.ts                 # Background worker entry point
+│
+├── shared/                   # Shared kernel (cross-cutting concerns)
+│   ├── core/                 # Core utilities (config, context, error, logger, id)
+│   ├── domain/               # DDD base classes (entity, aggregate, event)
+│   ├── port/                 # Shared port interfaces
+│   └── http/                 # HTTP utilities (envelope)
+│
+├── infra/                    # Infrastructure adapters
+│   ├── mongo/                # MongoDB (client, unit-of-work)
+│   ├── event-bus/            # Event bus (in-memory)
+│   └── http/                 # HTTP middleware
+│
+├── module/                   # Feature modules (bounded contexts)
+│   └── prompt/
+│       ├── domain/           # Domain layer (aggregates, entities, events)
+│       ├── application/      # Application layer (use cases, handlers, mappers)
+│       ├── port/             # Module-specific port interfaces
+│       └── infra/            # Module-specific adapters (persistence, http)
+│
+└── composition/              # Dependency injection wiring
+    ├── shared.composition.ts
+    ├── prompt.composition.ts
+    ├── api.composition.ts
+    └── worker.composition.ts
 ```
+
+#### Layer Dependencies
+
+```
+composition/ → modules, infra, shared
+     │
+     ▼
+module/*/infra/ → module/*/application, module/*/port, shared, infra
+     │
+     ▼
+module/*/application/ → module/*/domain, module/*/port, shared
+     │
+     ▼
+module/*/port/ → module/*/domain, shared
+     │
+     ▼
+module/*/domain/ → shared/domain, shared/core
+     │
+     ▼
+shared/ → (nothing)
+```
+
+#### Key Patterns
+
+- **Result type**: Uses `neverthrow` for explicit error handling (`Result<T, AppError>`)
+- **Validation**: Uses Zod schemas at boundaries
+- **Unit of Work**: Wraps use cases in MongoDB transactions
+- **Event Bus**: In-memory pub/sub for domain events
+- **Dependency Injection**: Manual wiring in `composition/` folder

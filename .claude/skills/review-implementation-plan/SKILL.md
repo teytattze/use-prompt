@@ -13,7 +13,7 @@ This skill reviews implementation plans to ensure they align with project conven
 
 - User has completed an implementation plan and wants it reviewed
 - User mentions "review", "validate", or "check" in context of a plan
-- User explicitly invokes `/review-implementation-plan {feature-name}`
+- User explicitly invokes `/review-implementation-plan`
 - Implementation plan exists and user wants quality assurance before execution
 
 ## Pipeline Context
@@ -30,8 +30,7 @@ The review ensures the implementation plan adheres to project standards before c
 
 The skill requires:
 
-- A feature name/identifier (e.g., `setup-message-entity`)
-- An `IMPLEMENTATION_PLAN.md` file at `task/feature/{feature-name}/IMPLEMENTATION_PLAN.md`
+- An `IMPLEMENTATION_PLAN.md` file at `@context/IMPLEMENTATION_PLAN.md`
 - Access to project memories: `code_style_and_conventions`, `project_overview`
 
 ## Review Process
@@ -144,14 +143,12 @@ Flag any issues:
 
 ### Report Location
 
-Save the review report to: `task/feature/{feature-name}/IMPLEMENTATION_PLAN_REVIEW.md`
+Save the review report to: `@context/IMPLEMENTATION_PLAN_REVIEW.md`
 
 ### Report Format
 
 ```markdown
 # Implementation Plan Review
-
-## Feature: {feature-name}
 
 ## Review Summary
 

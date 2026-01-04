@@ -5,6 +5,14 @@ const appErrorDetails = {
     message: "Internal server error",
     status: 500,
   },
+  unauthorized: {
+    message: "Unauthorized",
+    status: 401,
+  },
+  forbidden: {
+    message: "Forbidden",
+    status: 403,
+  },
 } as const satisfies Record<string, { status: number; message: string }>;
 
 type AppErrorDetails = typeof appErrorDetails;
