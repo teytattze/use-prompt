@@ -73,6 +73,9 @@ describe("CreatePromptUseCaseAdapter", () => {
           outboxInsertCalled = true;
           return ok(undefined);
         },
+        findPending: async () => ok([]),
+        markProcessed: async () => ok(undefined),
+        markFailed: async () => ok(undefined),
       };
 
       const useCase = new CreatePromptUseCaseAdapter(
@@ -119,6 +122,9 @@ describe("CreatePromptUseCaseAdapter", () => {
           capturedOutboxCtx = ctx;
           return ok(undefined);
         },
+        findPending: async () => ok([]),
+        markProcessed: async () => ok(undefined),
+        markFailed: async () => ok(undefined),
       };
 
       const useCase = new CreatePromptUseCaseAdapter(
@@ -161,6 +167,9 @@ describe("CreatePromptUseCaseAdapter", () => {
           outboxInsertCalled = true;
           return ok(undefined);
         },
+        findPending: async () => ok([]),
+        markProcessed: async () => ok(undefined),
+        markFailed: async () => ok(undefined),
       };
 
       const useCase = new CreatePromptUseCaseAdapter(
@@ -198,6 +207,9 @@ describe("CreatePromptUseCaseAdapter", () => {
 
       const mockOutbox: OutboxEventRepositoryPort = {
         insertMany: async () => err(mockError),
+        findPending: async () => ok([]),
+        markProcessed: async () => ok(undefined),
+        markFailed: async () => ok(undefined),
       };
 
       const useCase = new CreatePromptUseCaseAdapter(

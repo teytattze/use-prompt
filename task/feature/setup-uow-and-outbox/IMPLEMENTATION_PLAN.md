@@ -5,6 +5,7 @@
 This plan implements the Unit of Work (UoW) and Transactional Outbox patterns to enable reliable domain event persistence. The UoW pattern coordinates MongoDB transactions across aggregate and event persistence, while the Outbox pattern stores domain events in a dedicated collection for eventual publishing. This ensures atomicity: either both the aggregate and its events are persisted, or neither is.
 
 Key decisions:
+
 - Use MongoDB sessions and transactions (requires replica set configuration)
 - Follow existing hexagonal architecture with port/adapter separation
 - Extend `BaseEvent` with `occurredAt` timestamp for outbox ordering
@@ -90,6 +91,7 @@ volumes:
 **Dependencies:** None
 
 **Tests Required:**
+
 - Manual verification: `docker compose down -v && docker compose up -d`
 - Verify replica set: `mongosh --username root --password password --eval "rs.status()"`
 
@@ -107,7 +109,6 @@ volumes:
 
 ```typescript
 // app/service/src/lib/app-config.ts
-
 import { z } from "zod/v4";
 
 export const appConfigSchema = z.object({
@@ -142,6 +143,7 @@ export const appConfig = appConfigSchema.decode({
 **Dependencies:** `zod/v4`
 
 **Tests Required:**
+
 - Verify default value is applied
 - Verify min/max bounds validation
 
@@ -159,7 +161,6 @@ export const appConfig = appConfigSchema.decode({
 
 ```typescript
 // app/service/src/lib/app-context.ts
-
 import type { ClientSession } from "mongodb";
 import type { AppConfig } from "@/lib/app-config";
 import type { AppLogger } from "@/lib/app-logger";
@@ -180,7 +181,10 @@ export type AppContext = {
 };
 
 // 4. Helper to create context with session
-export function withSession(ctx: AppContext, session: ClientSession): AppContext {
+export function withSession(
+  ctx: AppContext,
+  session: ClientSession,
+): AppContext {
   return {
     ...ctx,
     db: {
@@ -204,11 +208,13 @@ export function createAppContext(
 ```
 
 **Dependencies:**
+
 - `mongodb` (ClientSession type)
 - `@/lib/app-config`
 - `@/lib/app-logger`
 
 **Tests Required:**
+
 - Test `withSession` creates new context with session
 - Test `withSession` preserves existing context properties
 - Test `createAppContext` creates context with empty db
@@ -229,7 +235,6 @@ export function createAppContext(
 
 ```typescript
 // app/service/src/lib/domain/base-event.ts
-
 import type { BaseProps } from "@/lib/domain/base-props";
 import { type Id, newId } from "@/lib/id";
 
@@ -253,6 +258,7 @@ export class BaseEvent<T extends BaseProps> {
 **Dependencies:** None
 
 **Tests Required:**
+
 - Verify `occurredAt` is set to current time on construction
 - Verify `occurredAt` is a Date instance
 
@@ -270,7 +276,6 @@ export class BaseEvent<T extends BaseProps> {
 
 ```typescript
 // app/service/src/lib/domain/base-aggregate.ts
-
 import { BaseEntity } from "@/lib/domain/base-entity";
 import type { BaseEvent } from "@/lib/domain/base-event";
 import type { BaseProps } from "@/lib/domain/base-props";
@@ -304,6 +309,7 @@ export class BaseAggregate<T extends BaseProps> extends BaseEntity<T> {
 **Dependencies:** None
 
 **Tests Required:**
+
 - Test `pullEvents()` returns all added events
 - Test `pullEvents()` clears internal events array
 - Test subsequent `pullEvents()` returns empty array
@@ -323,7 +329,6 @@ export class BaseAggregate<T extends BaseProps> extends BaseEntity<T> {
 
 ```typescript
 // app/service/src/lib/outbox/outbox-event-model.ts
-
 import type { BaseMongoModel } from "@/lib/mongo/base-mongo-model";
 
 // 1. Define outbox event status
@@ -363,6 +368,7 @@ export type OutboxEventModel = BaseMongoModel & {
 **Dependencies:** `@/lib/mongo/base-mongo-model`
 
 **Tests Required:**
+
 - Type checking via TypeScript (no runtime tests needed for types)
 
 ---
@@ -379,7 +385,6 @@ export type OutboxEventModel = BaseMongoModel & {
 
 ```typescript
 // app/service/src/lib/outbox/outbox-event-mapper.ts
-
 import type { BaseEvent } from "@/lib/domain/base-event";
 import type { BaseProps } from "@/lib/domain/base-props";
 import type { OutboxEventModel } from "@/lib/outbox/outbox-event-model";
@@ -421,11 +426,13 @@ export class OutboxEventMapper {
 ```
 
 **Dependencies:**
+
 - `@/lib/domain/base-event`
 - `@/lib/domain/base-props`
 - `@/lib/outbox/outbox-event-model`
 
 **Tests Required:**
+
 - Test `toModel` creates correct model from event
 - Test `eventType` is derived from constructor name
 - Test `status` defaults to "pending"
@@ -446,7 +453,6 @@ export class OutboxEventMapper {
 
 ```typescript
 // app/service/src/lib/outbox/port/outbox-repository-port.ts
-
 import type { Result } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import type { AppError } from "@/lib/app-error";
@@ -470,12 +476,14 @@ export interface OutboxRepositoryPort {
 ```
 
 **Dependencies:**
+
 - `neverthrow` (Result type)
 - `@/lib/app-context`
 - `@/lib/app-error`
 - `@/lib/outbox/outbox-event-model`
 
 **Tests Required:**
+
 - Interface tests via implementation tests
 
 ---
@@ -492,7 +500,6 @@ export interface OutboxRepositoryPort {
 
 ```typescript
 // app/service/src/lib/outbox/adapter/outbox-mongo-repository-adapter.ts
-
 import { attemptAsync, isNil } from "es-toolkit";
 import type { Collection } from "mongodb";
 import { type Result, err, ok } from "neverthrow";
@@ -538,6 +545,7 @@ export class OutboxMongoRepositoryAdapter implements OutboxRepositoryPort {
 ```
 
 **Dependencies:**
+
 - `es-toolkit` (attemptAsync, isNil)
 - `mongodb` (Collection)
 - `neverthrow` (Result, ok, err)
@@ -547,6 +555,7 @@ export class OutboxMongoRepositoryAdapter implements OutboxRepositoryPort {
 - `@/lib/outbox/port/outbox-repository-port`
 
 **Tests Required:**
+
 - Test successful insertion of single event
 - Test successful insertion of multiple events
 - Test empty events array returns ok
@@ -567,16 +576,13 @@ export class OutboxMongoRepositoryAdapter implements OutboxRepositoryPort {
 
 ```typescript
 // app/service/src/lib/unit-of-work/port/unit-of-work-port.ts
-
 import type { Result } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import type { AppError } from "@/lib/app-error";
 
 // 1. Define the work function type
 // Receives an AppContext with db.session populated and returns a Result
-export type UnitOfWorkFn<T> = (
-  ctx: AppContext,
-) => Promise<Result<T, AppError>>;
+export type UnitOfWorkFn<T> = (ctx: AppContext) => Promise<Result<T, AppError>>;
 
 // 2. Define Unit of Work interface
 export interface UnitOfWorkPort {
@@ -588,16 +594,21 @@ export interface UnitOfWorkPort {
   // - Commits on success (Result.isOk())
   // - Aborts on failure (Result.isErr())
   // - Always ends the session
-  execute<T>(ctx: AppContext, work: UnitOfWorkFn<T>): Promise<Result<T, AppError>>;
+  execute<T>(
+    ctx: AppContext,
+    work: UnitOfWorkFn<T>,
+  ): Promise<Result<T, AppError>>;
 }
 ```
 
 **Dependencies:**
+
 - `neverthrow` (Result type)
 - `@/lib/app-context`
 - `@/lib/app-error`
 
 **Tests Required:**
+
 - Interface tests via implementation tests
 
 ---
@@ -614,7 +625,6 @@ export interface UnitOfWorkPort {
 
 ```typescript
 // app/service/src/lib/unit-of-work/adapter/mongo-unit-of-work-adapter.ts
-
 import { attemptAsync, isNil } from "es-toolkit";
 import type { MongoClient } from "mongodb";
 import { type Result, err } from "neverthrow";
@@ -711,6 +721,7 @@ export class MongoUnitOfWorkAdapter implements UnitOfWorkPort {
 ```
 
 **Dependencies:**
+
 - `es-toolkit` (attemptAsync, isNil)
 - `mongodb` (MongoClient)
 - `neverthrow` (Result, err)
@@ -719,6 +730,7 @@ export class MongoUnitOfWorkAdapter implements UnitOfWorkPort {
 - `@/lib/unit-of-work/port/unit-of-work-port`
 
 **Tests Required:**
+
 - Test successful transaction commit when work returns ok
 - Test transaction abort when work returns err
 - Test session is always ended (even on error)
@@ -741,7 +753,6 @@ export class MongoUnitOfWorkAdapter implements UnitOfWorkPort {
 
 ```typescript
 // app/service/src/module/prompt/port/outbound/persistence/prompt-repository-port.ts
-
 import type { Result } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import type { AppError } from "@/lib/app-error";
@@ -754,9 +765,7 @@ export interface PromptRepositoryPort {
     data: PromptAggregate,
   ): Promise<Result<PromptAggregate, AppError>>;
 
-  findMany(
-    ctx: AppContext,
-  ): Promise<Result<PromptAggregate[], AppError>>;
+  findMany(ctx: AppContext): Promise<Result<PromptAggregate[], AppError>>;
 }
 ```
 
@@ -778,7 +787,6 @@ export interface PromptRepositoryPort {
 
 ```typescript
 // app/service/src/module/prompt/adapter/outbound/persistence/mongo/prompt-mongo-repository-adapter.ts
-
 import { attemptAsync, isNil } from "es-toolkit";
 import type { Collection } from "mongodb";
 import { type Result, err, ok } from "neverthrow";
@@ -809,7 +817,8 @@ export class PromptMongoRepository implements PromptRepositoryPort {
     const model = this.#mapper.fromDomain(data);
     const [error] = await attemptAsync(
       // 2. Pass session from context (may be undefined for non-transactional ops)
-      async () => await this.#collection.insertOne(model, { session: ctx.db.session }),
+      async () =>
+        await this.#collection.insertOne(model, { session: ctx.db.session }),
     );
     return !isNil(error) ? err(AppError.from(error)) : ok(data);
   }
@@ -820,7 +829,8 @@ export class PromptMongoRepository implements PromptRepositoryPort {
   ): Promise<Result<PromptAggregate[], AppError>> {
     const [error, documents] = await attemptAsync(
       // 4. Pass session from context to find operation
-      async () => await this.#collection.find({}, { session: ctx.db.session }).toArray(),
+      async () =>
+        await this.#collection.find({}, { session: ctx.db.session }).toArray(),
     );
     if (!isNil(error) || isNil(documents)) {
       return err(AppError.from(error));
@@ -832,9 +842,11 @@ export class PromptMongoRepository implements PromptRepositoryPort {
 ```
 
 **Dependencies:**
+
 - `mongodb` (Collection)
 
 **Tests Required:**
+
 - Test insertOne with ctx.db.session populated
 - Test insertOne with ctx.db.session undefined (backward compatible)
 - Test findMany with ctx.db.session populated
@@ -854,7 +866,6 @@ export class PromptMongoRepository implements PromptRepositoryPort {
 
 ```typescript
 // app/service/src/module/prompt/application/use-case/create-prompt-use-case-adapter.ts
-
 import { type Result, err } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import type { AppError } from "@/lib/app-error";
@@ -943,11 +954,13 @@ export class CreatePromptUseCaseAdapter implements CreatePromptUseCasePort {
 ```
 
 **Dependencies:**
+
 - `@/lib/outbox/outbox-event-mapper`
 - `@/lib/outbox/port/outbox-repository-port`
 - `@/lib/unit-of-work/port/unit-of-work-port`
 
 **Tests Required:**
+
 - Test successful creation persists aggregate and events
 - Test rollback when aggregate save fails (no events persisted)
 - Test rollback when outbox save fails (no aggregate persisted)
@@ -969,11 +982,10 @@ export class CreatePromptUseCaseAdapter implements CreatePromptUseCasePort {
 
 ```typescript
 // app/service/src/module/prompt/adapter/inbound/http/api.ts
-
 import { appConfig } from "@/lib/app-config";
 import { mongoClient } from "@/lib/mongo/mongo-client";
-import type { OutboxEventModel } from "@/lib/outbox/outbox-event-model";
 import { OutboxMongoRepositoryAdapter } from "@/lib/outbox/adapter/outbox-mongo-repository-adapter";
+import type { OutboxEventModel } from "@/lib/outbox/outbox-event-model";
 import { MongoUnitOfWorkAdapter } from "@/lib/unit-of-work/adapter/mongo-unit-of-work-adapter";
 import { PromptRouterFactory } from "@/module/prompt/adapter/inbound/http/router/prompt-router-factory";
 import {
@@ -991,8 +1003,9 @@ import { ListPromptsUseCaseAdapter } from "@/module/prompt/application/use-case/
 const promptDatabase = mongoClient.db(getMongoPromptDatabase());
 
 // 2. Existing prompt collection
-const promptCollection =
-  promptDatabase.collection<PromptMongoModel>(getMongoPromptCollection());
+const promptCollection = promptDatabase.collection<PromptMongoModel>(
+  getMongoPromptCollection(),
+);
 
 // 3. Create outbox collection reference
 // Using same database as prompts, collection name "outbox_events"
@@ -1002,12 +1015,11 @@ const outboxCollection =
 // 4. Create indexes for outbox collection (idempotent)
 // Compound index for efficient polling: status + occurredAt
 // This is called once at startup
-outboxCollection.createIndex(
-  { status: 1, occurredAt: 1 },
-  { background: true },
-).catch((err) => {
-  console.error("Failed to create outbox index:", err);
-});
+outboxCollection
+  .createIndex({ status: 1, occurredAt: 1 }, { background: true })
+  .catch((err) => {
+    console.error("Failed to create outbox index:", err);
+  });
 
 // 5. Existing mappers
 const promptMongoModelMapper = new PromptMongoModelMapper();
@@ -1050,12 +1062,14 @@ export const promptHttpRouterV1 = promptHttpRouterV1Factory.make();
 ```
 
 **Dependencies:**
+
 - `@/lib/app-config`
 - `@/lib/outbox/outbox-event-model`
 - `@/lib/outbox/adapter/outbox-mongo-repository-adapter`
 - `@/lib/unit-of-work/adapter/mongo-unit-of-work-adapter`
 
 **Tests Required:**
+
 - Integration test: verify outbox collection is created
 - Integration test: verify index is created on outbox collection
 
@@ -1073,14 +1087,13 @@ export const promptHttpRouterV1 = promptHttpRouterV1Factory.make();
 
 ```typescript
 // app/service/src/lib/outbox/adapter/outbox-mongo-repository-adapter.test.ts
-
 import { describe, expect, it, mock } from "bun:test";
+import type { ClientSession, Collection } from "mongodb";
 import { err, ok } from "neverthrow";
-import type { Collection, ClientSession } from "mongodb";
-import { OutboxMongoRepositoryAdapter } from "./outbox-mongo-repository-adapter";
-import type { OutboxEventModel } from "@/lib/outbox/outbox-event-model";
 import type { AppContext } from "@/lib/app-context";
 import type { Id } from "@/lib/id";
+import type { OutboxEventModel } from "@/lib/outbox/outbox-event-model";
+import { OutboxMongoRepositoryAdapter } from "./outbox-mongo-repository-adapter";
 
 describe("OutboxMongoRepositoryAdapter", () => {
   // 1. Helper to create mock event
@@ -1097,9 +1110,10 @@ describe("OutboxMongoRepositoryAdapter", () => {
   });
 
   // 2. Helper to create mock collection
-  const createMockCollection = (insertManyFn: () => Promise<unknown>) => ({
-    insertMany: mock(insertManyFn),
-  }) as unknown as Collection<OutboxEventModel>;
+  const createMockCollection = (insertManyFn: () => Promise<unknown>) =>
+    ({
+      insertMany: mock(insertManyFn),
+    }) as unknown as Collection<OutboxEventModel>;
 
   // 3. Helper to create mock context
   const createMockContext = (session?: ClientSession): AppContext => ({
@@ -1205,12 +1219,14 @@ describe("OutboxMongoRepositoryAdapter", () => {
 ```
 
 **Dependencies:**
+
 - `bun:test`
 - `neverthrow`
 - `mongodb` types
 - `@/lib/app-context`
 
 **Tests Required:**
+
 - This IS the test file
 
 ---
@@ -1227,13 +1243,12 @@ describe("OutboxMongoRepositoryAdapter", () => {
 
 ```typescript
 // app/service/src/lib/unit-of-work/adapter/mongo-unit-of-work-adapter.test.ts
-
-import { describe, expect, it, mock, beforeEach } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
+import type { ClientSession, MongoClient } from "mongodb";
 import { err, ok } from "neverthrow";
-import type { MongoClient, ClientSession } from "mongodb";
-import { MongoUnitOfWorkAdapter } from "./mongo-unit-of-work-adapter";
 import type { AppContext } from "@/lib/app-context";
 import { AppError } from "@/lib/app-error";
+import { MongoUnitOfWorkAdapter } from "./mongo-unit-of-work-adapter";
 
 describe("MongoUnitOfWorkAdapter", () => {
   // 1. Mock session factory
@@ -1255,9 +1270,10 @@ describe("MongoUnitOfWorkAdapter", () => {
   };
 
   // 2. Mock client factory
-  const createMockClient = (session: ClientSession) => ({
-    startSession: mock(() => session),
-  }) as unknown as MongoClient;
+  const createMockClient = (session: ClientSession) =>
+    ({
+      startSession: mock(() => session),
+    }) as unknown as MongoClient;
 
   // 3. Create base context
   const createBaseContext = (): AppContext => ({
@@ -1400,6 +1416,7 @@ describe("MongoUnitOfWorkAdapter", () => {
 ```
 
 **Dependencies:**
+
 - `bun:test`
 - `neverthrow`
 - `mongodb` types
@@ -1407,6 +1424,7 @@ describe("MongoUnitOfWorkAdapter", () => {
 - `@/lib/app-error`
 
 **Tests Required:**
+
 - This IS the test file
 
 ---
@@ -1423,10 +1441,9 @@ describe("MongoUnitOfWorkAdapter", () => {
 
 ```typescript
 // app/service/src/module/prompt/application/use-case/create-prompt-use-case-adapter.test.ts
-
 import { describe, expect, it, mock } from "bun:test";
-import { err, ok } from "neverthrow";
 import type { ClientSession } from "mongodb";
+import { err, ok } from "neverthrow";
 import type { AppContext } from "@/lib/app-context";
 import { AppError } from "@/lib/app-error";
 import type { OutboxRepositoryPort } from "@/lib/outbox/port/outbox-repository-port";
@@ -1467,7 +1484,9 @@ describe("CreatePromptUseCaseAdapter", () => {
 
   // 4. Helper to create mock repository
   const createMockRepository = (
-    insertResult: ReturnType<typeof ok<PromptAggregate, AppError>> | ReturnType<typeof err<PromptAggregate, AppError>>,
+    insertResult:
+      | ReturnType<typeof ok<PromptAggregate, AppError>>
+      | ReturnType<typeof err<PromptAggregate, AppError>>,
   ): PromptRepositoryPort => ({
     insertOne: mock(async () => insertResult),
     findMany: mock(async () => ok([])),
@@ -1475,7 +1494,9 @@ describe("CreatePromptUseCaseAdapter", () => {
 
   // 5. Helper to create mock outbox repository
   const createMockOutboxRepository = (
-    insertResult: ReturnType<typeof ok<void, AppError>> | ReturnType<typeof err<void, AppError>>,
+    insertResult:
+      | ReturnType<typeof ok<void, AppError>>
+      | ReturnType<typeof err<void, AppError>>,
   ): OutboxRepositoryPort => ({
     insertMany: mock(async () => insertResult),
   });
@@ -1623,12 +1644,14 @@ describe("CreatePromptUseCaseAdapter", () => {
 ```
 
 **Dependencies:**
+
 - `bun:test`
 - `neverthrow`
 - `@/lib/app-context`
 - All related types
 
 **Tests Required:**
+
 - This IS the test file
 
 ---
@@ -1666,25 +1689,25 @@ describe("CreatePromptUseCaseAdapter", () => {
 
 ## 5. Integration Points
 
-| Service | Interaction | Error Handling |
-|---------|-------------|----------------|
+| Service | Interaction                      | Error Handling                      |
+| ------- | -------------------------------- | ----------------------------------- |
 | MongoDB | Session & transaction management | Abort transaction, wrap in AppError |
-| MongoDB | Outbox event insertion | Abort transaction on failure |
-| MongoDB | Aggregate persistence | Abort transaction on failure |
+| MongoDB | Outbox event insertion           | Abort transaction on failure        |
+| MongoDB | Aggregate persistence            | Abort transaction on failure        |
 
 ## 6. Edge Cases & Error Handling
 
-| Scenario | Handling |
-|----------|----------|
-| Empty events array | Skip outbox insert, return ok |
-| MongoDB connection failure | Wrap in AppError, abort transaction |
-| Transaction timeout | MongoDB aborts automatically, return error |
-| Commit failure | Return error, session ended |
-| Abort failure | Log error, still return original error |
-| Aggregate without events | Works correctly, empty outbox insert skipped |
-| Duplicate event ID | MongoDB throws, transaction aborts |
-| Session expired | MongoDB throws, wrapped in AppError |
-| Work function throws | Catch, abort, wrap in AppError |
+| Scenario                   | Handling                                     |
+| -------------------------- | -------------------------------------------- |
+| Empty events array         | Skip outbox insert, return ok                |
+| MongoDB connection failure | Wrap in AppError, abort transaction          |
+| Transaction timeout        | MongoDB aborts automatically, return error   |
+| Commit failure             | Return error, session ended                  |
+| Abort failure              | Log error, still return original error       |
+| Aggregate without events   | Works correctly, empty outbox insert skipped |
+| Duplicate event ID         | MongoDB throws, transaction aborts           |
+| Session expired            | MongoDB throws, wrapped in AppError          |
+| Work function throws       | Catch, abort, wrap in AppError               |
 
 ## 7. Testing Strategy
 
@@ -1710,6 +1733,7 @@ describe("CreatePromptUseCaseAdapter", () => {
 **Manual Verification:**
 
 1. Start MongoDB with replica set:
+
    ```bash
    docker compose down -v && docker compose up -d
    ```
@@ -1717,6 +1741,7 @@ describe("CreatePromptUseCaseAdapter", () => {
 2. Wait for healthcheck to pass (replica set initialization)
 
 3. Create a prompt via API:
+
    ```bash
    curl -X POST http://localhost:3000/api/v1/prompts \
      -H "Content-Type: application/json" \
@@ -1724,12 +1749,14 @@ describe("CreatePromptUseCaseAdapter", () => {
    ```
 
 4. Verify prompt is in prompts collection:
+
    ```bash
    mongosh "mongodb://root:password@localhost:27017/use_prompt?authSource=admin&replicaSet=rs0" \
      --eval "db.prompts.find().pretty()"
    ```
 
 5. Verify event is in outbox_events collection:
+
    ```bash
    mongosh "mongodb://root:password@localhost:27017/use_prompt?authSource=admin&replicaSet=rs0" \
      --eval "db.outbox_events.find().pretty()"
@@ -1763,10 +1790,12 @@ Recommended sequence for implementation:
 16. **Step 16-18: Create Unit Tests** - Can be done alongside implementation
 
 **Parallelization opportunities:**
+
 - Steps 6-9 (Outbox) can be done in parallel with Steps 10-11 (UoW)
 - Test files can be written alongside their implementation files
 
 **Key Changes from Original Plan:**
+
 - Added Step 3 to extend `AppContext` with `db.session`
 - Repository ports no longer need `session` parameter - they access via `ctx.db.session`
 - UoW uses `withSession()` helper to create transactional context

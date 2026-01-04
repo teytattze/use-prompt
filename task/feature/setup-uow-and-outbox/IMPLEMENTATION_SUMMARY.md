@@ -33,19 +33,19 @@ MODIFIED:
 
 ## 3. Tests Added
 
-| Test File                                          | Test Cases | Coverage                                  |
-| -------------------------------------------------- | ---------- | ----------------------------------------- |
-| outbox-mongo-repository-adapter.test.ts            | 5 tests    | Insert success/failure, session handling  |
-| mongo-unit-of-work-adapter.test.ts                 | 6 tests    | Commit/abort, session propagation, errors |
-| create-prompt-use-case-adapter.test.ts             | 4 tests    | UoW integration, rollback scenarios       |
+| Test File                               | Test Cases | Coverage                                  |
+| --------------------------------------- | ---------- | ----------------------------------------- |
+| outbox-mongo-repository-adapter.test.ts | 5 tests    | Insert success/failure, session handling  |
+| mongo-unit-of-work-adapter.test.ts      | 6 tests    | Commit/abort, session propagation, errors |
+| create-prompt-use-case-adapter.test.ts  | 4 tests    | UoW integration, rollback scenarios       |
 
 ## 4. Deviations from Plan
 
-| Step | Planned                                    | Actual                                      | Reason                                                                 |
-| ---- | ------------------------------------------ | ------------------------------------------- | ---------------------------------------------------------------------- |
-| 15   | Only update api.ts                         | Also updated setup-app-context-middleware.ts | The middleware creates AppContext and needed db: {} property           |
-| 18   | Modify existing test                       | Created new test file                       | No existing test file existed for CreatePromptUseCaseAdapter           |
-| -    | Update list-prompts test                   | Added db: {} to mockCtx                     | Existing test needed update to match new AppContext type               |
+| Step | Planned                  | Actual                                       | Reason                                                       |
+| ---- | ------------------------ | -------------------------------------------- | ------------------------------------------------------------ |
+| 15   | Only update api.ts       | Also updated setup-app-context-middleware.ts | The middleware creates AppContext and needed db: {} property |
+| 18   | Modify existing test     | Created new test file                        | No existing test file existed for CreatePromptUseCaseAdapter |
+| -    | Update list-prompts test | Added db: {} to mockCtx                      | Existing test needed update to match new AppContext type     |
 
 ## 5. Verification
 
@@ -59,26 +59,31 @@ MODIFIED:
 Steps to manually verify the feature works:
 
 1. Stop and remove existing MongoDB container:
+
    ```bash
    docker compose down -v
    ```
 
 2. Start MongoDB with replica set:
+
    ```bash
    docker compose up -d
    ```
 
 3. Wait for healthcheck to pass (replica set initialization, ~30 seconds):
+
    ```bash
    docker compose ps  # Wait until mongo shows "healthy"
    ```
 
 4. Start the service:
+
    ```bash
    bun run dev --filter ./app/service
    ```
 
 5. Create a prompt via API:
+
    ```bash
    curl -X POST http://localhost:3000/api/v1/prompt \
      -H "Content-Type: application/json" \
@@ -86,12 +91,14 @@ Steps to manually verify the feature works:
    ```
 
 6. Verify prompt is in prompts collection:
+
    ```bash
    mongosh "mongodb://root:password@localhost:27017/use_prompt?authSource=admin&replicaSet=rs0&directConnection=true" \
      --eval "db.prompts.find().pretty()"
    ```
 
 7. Verify event is in outbox_events collection:
+
    ```bash
    mongosh "mongodb://root:password@localhost:27017/use_prompt?authSource=admin&replicaSet=rs0&directConnection=true" \
      --eval "db.outbox_events.find().pretty()"
