@@ -1,10 +1,21 @@
 import openapi, { fromTypes } from "@elysiajs/openapi";
 import Elysia from "elysia";
+import { z } from "zod/v4";
 import { promptHttpRouterV1 } from "@/composition/api.composition";
+import { appConfig } from "@/shared/core/app-config";
 
 const app = new Elysia();
 
 app
-  .use(openapi({ references: fromTypes() }))
+  .use(
+    openapi({
+      mapJsonSchema: {
+        zod: z.toJSONSchema,
+      },
+      references: fromTypes(
+        appConfig.app.env === "production" ? "dist/api.d.ts" : "src/api.ts",
+      ),
+    }),
+  )
   .use(promptHttpRouterV1)
   .listen(3000);
