@@ -37,6 +37,7 @@ export class CreatePromptUseCase implements CreatePromptUseCasePort {
     return this.#unitOfWork.execute(ctx, async (ctx) => {
       const promptAggregate = PromptAggregate.new({
         title: input.title,
+        description: input.description,
         messages: input.messages,
       });
 
