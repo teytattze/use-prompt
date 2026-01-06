@@ -7,6 +7,7 @@ export class PromptDtoMapper implements DtoMapperPort<PromptAggregate, PromptDto
     return {
       id: domain.id,
       title: domain.props.title,
+      description: domain.props.description,
       messages: domain.props.messages,
     };
   }

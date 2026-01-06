@@ -8,6 +8,10 @@
           "type": "string",
           "analyzer": "lucene.standard"
         },
+        "description": {
+          "type": "string",
+          "analyzer": "lucene.standard"
+        },
         "messages": {
           "type": "document",
           "fields": {

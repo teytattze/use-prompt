@@ -70,7 +70,7 @@ export class PromptMongoRepository implements PromptRepositoryPort {
           index: "prompt_search",
           text: {
             query: query.query,
-            path: ["title", "messages.content"],
+            path: ["title", "description", "messages.content"],
             fuzzy: {
               maxEdits: 1,
               prefixLength: 2,

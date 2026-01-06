@@ -5,6 +5,7 @@ import type { PromptDto } from "@/module/prompt/application/dto/prompt.dto";
 
 export const createPromptInputSchema = z.object({
   title: promptAggregatePropsSchema.shape.title,
+  description: promptAggregatePropsSchema.shape.description,
   messages: promptAggregatePropsSchema.shape.messages,
 });
 export type CreatePromptInput = z.infer<typeof createPromptInputSchema>;
