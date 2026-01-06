@@ -1,13 +1,17 @@
 import { attemptAsync, isNil } from "es-toolkit";
 import { get } from "es-toolkit/compat";
-import type { Collection } from "mongodb";
+import type { Collection, Document } from "mongodb";
 import { type Result, err, ok } from "neverthrow";
 import type { AppContext } from "@/shared/core/app-context";
 import { AppError } from "@/shared/core/app-error";
 import type { PersistenceMapperPort } from "@/shared/port/persistence-mapper.port";
 import type { PromptMongoModel } from "@/module/prompt/infra/persistence/prompt-mongo.model";
 import type { PromptAggregate } from "@/module/prompt/domain/aggregate/prompt.aggregate";
-import type { PromptRepositoryPort } from "@/module/prompt/port/prompt-repository.port";
+import type {
+  PromptRepositoryPort,
+  SearchPromptsQuery,
+  SearchPromptsResult,
+} from "@/module/prompt/port/prompt-repository.port";
 
 export class PromptMongoRepository implements PromptRepositoryPort {
   #collection: Collection<PromptMongoModel>;
@@ -52,5 +56,55 @@ export class PromptMongoRepository implements PromptRepositoryPort {
       documents?.map((doc) => this.#mapper.toDomain(doc)) ?? [];
 
     return ok(aggregates);
+  }
+
+  async search(
+    ctx: AppContext,
+    query: SearchPromptsQuery,
+  ): Promise<Result<SearchPromptsResult, AppError>> {
+    const limit = query.limit ?? 20;
+
+    const pipeline: Document[] = [
+      {
+        $search: {
+          index: "prompt_search",
+          text: {
+            query: query.query,
+            path: ["title", "messages.content"],
+            fuzzy: {
+              maxEdits: 1,
+              prefixLength: 2,
+            },
+          },
+        },
+      },
+      {
+        $facet: {
+          results: [{ $limit: limit }],
+          total: [{ $count: "count" }],
+        },
+      },
+    ];
+
+    const [error, result] = await attemptAsync(async () =>
+      this.#collection
+        .aggregate<{
+          results: PromptMongoModel[];
+          total: [{ count: number }] | [];
+        }>(pipeline, { session: ctx.db.session })
+        .toArray(),
+    );
+
+    if (!isNil(error)) {
+      return err(AppError.from(error, { message: get(error, "message") }));
+    }
+
+    const facetResult = result?.[0];
+    const documents = facetResult?.results ?? [];
+    const total = facetResult?.total[0]?.count ?? 0;
+
+    const aggregates = documents.map((doc) => this.#mapper.toDomain(doc));
+
+    return ok({ prompts: aggregates, total });
   }
 }

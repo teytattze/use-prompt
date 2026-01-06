@@ -6,18 +6,25 @@ import {
   createPromptInputSchema,
 } from "@/module/prompt/port/create-prompt-use-case.port";
 import type { ListPromptsUseCasePort } from "@/module/prompt/port/list-prompts-use-case.port";
+import {
+  type SearchPromptsUseCasePort,
+  searchPromptsInputSchema,
+} from "@/module/prompt/port/search-prompts-use-case.port";
 import { HttpEnvelope } from "@/shared/http/http-envelope";
 
 export class PromptRouter {
   #createPromptUseCase: CreatePromptUseCasePort;
   #listPromptsUseCase: ListPromptsUseCasePort;
+  #searchPromptsUseCase: SearchPromptsUseCasePort;
 
   constructor(
     createPromptUseCase: CreatePromptUseCasePort,
     listPromptsUseCase: ListPromptsUseCasePort,
+    searchPromptsUseCase: SearchPromptsUseCasePort,
   ) {
     this.#createPromptUseCase = createPromptUseCase;
     this.#listPromptsUseCase = listPromptsUseCase;
+    this.#searchPromptsUseCase = searchPromptsUseCase;
   }
 
   make() {
@@ -41,6 +48,17 @@ export class PromptRouter {
           return HttpEnvelope.ok({ data: result.value }).toJson();
         },
         { body: createPromptInputSchema },
+      )
+      .get(
+        "/search",
+        async ({ query, ctx }) => {
+          const result = await this.#searchPromptsUseCase.execute(ctx, query);
+          if (result.isErr()) {
+            return HttpEnvelope.error(result.error).toJson();
+          }
+          return HttpEnvelope.ok({ data: result.value }).toJson();
+        },
+        { query: searchPromptsInputSchema },
       );
   }
 }

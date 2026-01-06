@@ -1,0 +1,23 @@
+{
+  "name": "prompt_search",
+  "definition": {
+    "mappings": {
+      "dynamic": false,
+      "fields": {
+        "title": {
+          "type": "string",
+          "analyzer": "lucene.standard"
+        },
+        "messages": {
+          "type": "document",
+          "fields": {
+            "content": {
+              "type": "string",
+              "analyzer": "lucene.standard"
+            }
+          }
+        }
+      }
+    }
+  }
+}

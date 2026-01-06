@@ -46,6 +46,7 @@ describe("ListPromptsUseCase", () => {
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => ok(aggregate1),
         findMany: async () => ok([aggregate1, aggregate2]),
+        search: async () => ok({ prompts: [], total: 0 }),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
@@ -65,6 +66,7 @@ describe("ListPromptsUseCase", () => {
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => ok({} as PromptAggregate),
         findMany: async () => ok([]),
+        search: async () => ok({ prompts: [], total: 0 }),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
@@ -81,6 +83,7 @@ describe("ListPromptsUseCase", () => {
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => err(mockError),
         findMany: async () => err(mockError),
+        search: async () => err(mockError),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
