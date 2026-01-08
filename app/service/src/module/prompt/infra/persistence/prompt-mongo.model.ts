@@ -9,5 +9,6 @@ export type MessageMongoModel = {
 
 export type PromptMongoModel = BaseMongoModel & {
   title: string;
+  description: string;
   messages: MessageMongoModel[];
 };

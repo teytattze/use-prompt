@@ -16,17 +16,19 @@ describe("ListPromptsUseCase", () => {
   const createMockAggregate = (
     id: string,
     title: string,
+    description: string,
     messages: Array<{ type: string; content: string; order: number }>,
   ) =>
     ({
       id,
-      props: { title, messages },
+      props: { title, description, messages },
     }) as unknown as PromptAggregate;
 
   const mockMapper = {
     toDto: (aggregate: PromptAggregate) => ({
       id: aggregate.id,
       title: aggregate.props.title,
+      description: aggregate.props.description,
       messages: aggregate.props.messages,
     }),
   };
@@ -40,12 +42,13 @@ describe("ListPromptsUseCase", () => {
         { type: "instruction", content: "Test Content 2", order: 0 },
       ];
 
-      const aggregate1 = createMockAggregate("1", "Test Title 1", messages1);
-      const aggregate2 = createMockAggregate("2", "Test Title 2", messages2);
+      const aggregate1 = createMockAggregate("1", "Test Title 1", "Description 1", messages1);
+      const aggregate2 = createMockAggregate("2", "Test Title 2", "Description 2", messages2);
 
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => ok(aggregate1),
         findMany: async () => ok([aggregate1, aggregate2]),
+        search: async () => ok({ prompts: [], total: 0 }),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
@@ -65,6 +68,7 @@ describe("ListPromptsUseCase", () => {
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => ok({} as PromptAggregate),
         findMany: async () => ok([]),
+        search: async () => ok({ prompts: [], total: 0 }),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
@@ -81,6 +85,7 @@ describe("ListPromptsUseCase", () => {
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => err(mockError),
         findMany: async () => err(mockError),
+        search: async () => err(mockError),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);

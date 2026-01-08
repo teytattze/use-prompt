@@ -10,6 +10,7 @@ export class PromptMongoMapper implements PersistenceMapperPort<
     return {
       _id: domain.id,
       title: domain.props.title,
+      description: domain.props.description,
       messages: domain.props.messages.map((message) => ({
         type: message.type,
         content: message.content,
@@ -21,6 +22,7 @@ export class PromptMongoMapper implements PersistenceMapperPort<
   toDomain(model: PromptMongoModel): PromptAggregate {
     return new PromptAggregate(model._id, {
       title: model.title,
+      description: model.description,
       messages: model.messages.map((message) => ({
         type: message.type,
         content: message.content,

@@ -5,6 +5,7 @@ import { promptAggregatePropsSchema } from "@/module/prompt/domain/aggregate/pro
 export const promptDtoSchema = z.object({
   id: idSchema,
   title: promptAggregatePropsSchema.shape.title,
+  description: promptAggregatePropsSchema.shape.description,
   messages: promptAggregatePropsSchema.shape.messages,
 });
 

@@ -19,6 +19,7 @@ export class PromptAggregate extends BaseDomainAggregate<PromptAggregateProps> {
       PromptCreatedEvent.name,
       {
         title: aggregate.props.title,
+        description: aggregate.props.description,
         messages: aggregate.props.messages,
       },
     );

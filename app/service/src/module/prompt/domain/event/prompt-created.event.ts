@@ -4,6 +4,7 @@ import { promptAggregatePropsSchema } from "@/module/prompt/domain/aggregate/pro
 
 const promptCreatedEventPropsSchema = z.object({
   title: promptAggregatePropsSchema.shape.title,
+  description: promptAggregatePropsSchema.shape.description,
   messages: promptAggregatePropsSchema.shape.messages,
 });
 type PromptCreatedEventProps = z.output<typeof promptCreatedEventPropsSchema>;
