@@ -11,4 +11,7 @@ export type PromptMongoModel = BaseMongoModel & {
   title: string;
   description: string;
   messages: MessageMongoModel[];
+  upvotes: number;
+  downvotes: number;
+  usedCount: number;
 };

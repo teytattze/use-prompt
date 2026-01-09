@@ -2,10 +2,9 @@ import type { PersistenceMapperPort } from "@/shared/port/persistence-mapper.por
 import type { PromptMongoModel } from "@/module/prompt/infra/persistence/prompt-mongo.model";
 import { PromptAggregate } from "@/module/prompt/domain/aggregate/prompt.aggregate";
 
-export class PromptMongoMapper implements PersistenceMapperPort<
-  PromptAggregate,
-  PromptMongoModel
-> {
+export class PromptMongoMapper
+  implements PersistenceMapperPort<PromptAggregate, PromptMongoModel>
+{
   fromDomain(domain: PromptAggregate): PromptMongoModel {
     return {
       _id: domain.id,
@@ -16,6 +15,9 @@ export class PromptMongoMapper implements PersistenceMapperPort<
         content: message.content,
         order: message.order,
       })),
+      upvotes: domain.props.upvotes,
+      downvotes: domain.props.downvotes,
+      usedCount: domain.props.usedCount,
     };
   }
 
@@ -28,6 +30,9 @@ export class PromptMongoMapper implements PersistenceMapperPort<
         content: message.content,
         order: message.order,
       })),
+      upvotes: model.upvotes ?? 0,
+      downvotes: model.downvotes ?? 0,
+      usedCount: model.usedCount ?? 0,
     });
   }
 }

@@ -4,10 +4,12 @@ import type { Collection, Document } from "mongodb";
 import { type Result, err, ok } from "neverthrow";
 import type { AppContext } from "@/shared/core/app-context";
 import { AppError } from "@/shared/core/app-error";
+import type { Id } from "@/shared/core/id";
 import type { PersistenceMapperPort } from "@/shared/port/persistence-mapper.port";
 import type { PromptMongoModel } from "@/module/prompt/infra/persistence/prompt-mongo.model";
 import type { PromptAggregate } from "@/module/prompt/domain/aggregate/prompt.aggregate";
 import type {
+  CounterUpdates,
   PromptRepositoryPort,
   SearchPromptsQuery,
   SearchPromptsResult,
@@ -39,6 +41,29 @@ export class PromptMongoRepository implements PromptRepositoryPort {
     return isNil(error)
       ? ok(data)
       : err(AppError.from(error, { message: get(error, "message") }));
+  }
+
+  async findById(
+    ctx: AppContext,
+    id: Id,
+  ): Promise<Result<PromptAggregate | null, AppError>> {
+    const [error, document] = await attemptAsync(
+      async () =>
+        await this.#collection.findOne(
+          { _id: id },
+          { session: ctx.db.session },
+        ),
+    );
+
+    if (!isNil(error)) {
+      return err(AppError.from(error, { message: get(error, "message") }));
+    }
+
+    if (isNil(document)) {
+      return ok(null);
+    }
+
+    return ok(this.#mapper.toDomain(document));
   }
 
   async findMany(
@@ -106,5 +131,60 @@ export class PromptMongoRepository implements PromptRepositoryPort {
     const aggregates = documents.map((doc) => this.#mapper.toDomain(doc));
 
     return ok({ prompts: aggregates, total });
+  }
+
+  async updateCounters(
+    ctx: AppContext,
+    id: Id,
+    updates: CounterUpdates,
+  ): Promise<Result<void, AppError>> {
+    const $inc: Record<string, number> = {};
+
+    if (updates.upvotes !== undefined) {
+      $inc.upvotes = updates.upvotes;
+    }
+    if (updates.downvotes !== undefined) {
+      $inc.downvotes = updates.downvotes;
+    }
+    if (updates.usedCount !== undefined) {
+      $inc.usedCount = updates.usedCount;
+    }
+
+    if (Object.keys($inc).length === 0) {
+      return ok(undefined);
+    }
+
+    const [error] = await attemptAsync(
+      async () =>
+        await this.#collection.updateOne(
+          { _id: id },
+          { $inc },
+          { session: ctx.db.session },
+        ),
+    );
+
+    return isNil(error)
+      ? ok(undefined)
+      : err(AppError.from(error, { message: get(error, "message") }));
+  }
+
+  async incrementUsedCount(
+    ctx: AppContext,
+    id: Id,
+  ): Promise<Result<number, AppError>> {
+    const [error, result] = await attemptAsync(
+      async () =>
+        await this.#collection.findOneAndUpdate(
+          { _id: id },
+          { $inc: { usedCount: 1 } },
+          { session: ctx.db.session, returnDocument: "after" },
+        ),
+    );
+
+    if (!isNil(error)) {
+      return err(AppError.from(error, { message: get(error, "message") }));
+    }
+
+    return ok(result?.usedCount ?? 1);
   }
 }

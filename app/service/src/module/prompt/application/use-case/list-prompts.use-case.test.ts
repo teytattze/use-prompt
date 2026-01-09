@@ -47,8 +47,11 @@ describe("ListPromptsUseCase", () => {
 
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => ok(aggregate1),
+        findById: async () => ok(null),
         findMany: async () => ok([aggregate1, aggregate2]),
         search: async () => ok({ prompts: [], total: 0 }),
+        updateCounters: async () => ok(undefined),
+        incrementUsedCount: async () => ok(1),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
@@ -67,8 +70,11 @@ describe("ListPromptsUseCase", () => {
     it("should return empty array when no prompts exist", async () => {
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => ok({} as PromptAggregate),
+        findById: async () => ok(null),
         findMany: async () => ok([]),
         search: async () => ok({ prompts: [], total: 0 }),
+        updateCounters: async () => ok(undefined),
+        incrementUsedCount: async () => ok(1),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
@@ -84,8 +90,11 @@ describe("ListPromptsUseCase", () => {
       const mockError = AppError.from("unknown");
       const mockRepository: PromptRepositoryPort = {
         insertOne: async () => err(mockError),
+        findById: async () => err(mockError),
         findMany: async () => err(mockError),
         search: async () => err(mockError),
+        updateCounters: async () => err(mockError),
+        incrementUsedCount: async () => err(mockError),
       };
 
       const useCase = new ListPromptsUseCase(mockMapper, mockRepository);

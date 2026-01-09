@@ -13,7 +13,12 @@ export class PromptAggregate extends BaseDomainAggregate<PromptAggregateProps> {
   }
 
   static new(props: PromptAggregatePropsInput): PromptAggregate {
-    const aggregate = new PromptAggregate(newId(), props);
+    const aggregate = new PromptAggregate(newId(), {
+      ...props,
+      upvotes: 0,
+      downvotes: 0,
+      usedCount: 0,
+    });
     const event = new PromptCreatedEvent(
       aggregate.id,
       PromptCreatedEvent.name,
@@ -25,5 +30,9 @@ export class PromptAggregate extends BaseDomainAggregate<PromptAggregateProps> {
     );
     aggregate.addEvent(event);
     return aggregate;
+  }
+
+  get voteCount(): number {
+    return this.props.upvotes - this.props.downvotes;
   }
 }
