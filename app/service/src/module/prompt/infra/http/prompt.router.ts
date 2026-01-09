@@ -1,9 +1,7 @@
 import { Elysia, t } from "elysia";
 import { setupAppContextMiddleware } from "@/infra/http/app-context.middleware";
 import { setupAuthGuardMiddleware } from "@/infra/http/auth-guard.middleware";
-import { setupOptionalAuthMiddleware } from "@/infra/http/optional-auth.middleware";
 import { idSchema } from "@/shared/core/id";
-import { withUser } from "@/shared/core/app-context";
 import { AppError } from "@/shared/core/app-error";
 import {
   type CreatePromptUseCasePort,
@@ -126,22 +124,20 @@ export class PromptRouter {
         { params: t.Object({ id: t.String() }) },
       );
 
-    const optionalAuthRouter = new Elysia({
-      name: "prompt-optional-auth-router",
+    const publicRouter = new Elysia({
+      name: "prompt-public-router",
     })
       .use(setupAppContextMiddleware())
-      .use(setupOptionalAuthMiddleware())
       .get(
         "/:id",
-        async ({ params, ctx, user }) => {
+        async ({ params, ctx }) => {
           const promptId = idSchema.safeParse(params.id);
           if (!promptId.success) {
             return HttpEnvelope.error(
               AppError.from("unknown", { message: "Invalid prompt ID" }),
             ).toJson();
           }
-          const ctxWithUser = user ? withUser(ctx, user) : ctx;
-          const result = await this.#getPromptUseCase.execute(ctxWithUser, {
+          const result = await this.#getPromptUseCase.execute(ctx, {
             promptId: promptId.data,
           });
           if (result.isErr()) {
@@ -173,6 +169,6 @@ export class PromptRouter {
 
     return new Elysia({ name: "prompt-router-v1", prefix: "/api/v1/prompt" })
       .use(authRouter)
-      .use(optionalAuthRouter);
+      .use(publicRouter);
   }
 }
