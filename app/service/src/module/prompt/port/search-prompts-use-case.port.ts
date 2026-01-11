@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
-import type { UseCasePort } from "@/shared/port/use-case.port";
 import type { PromptDto } from "@/module/prompt/application/dto/prompt.dto";
+import type { UseCasePort } from "@/shared/port/use-case.port";
 
 export const searchPromptsInputSchema = z.object({
   query: z.string().min(1).max(200),
@@ -13,5 +13,7 @@ export type SearchPromptsOutput = {
   total: number;
 };
 
-export interface SearchPromptsUseCasePort
-  extends UseCasePort<SearchPromptsInput, SearchPromptsOutput> {}
+export interface SearchPromptsUseCasePort extends UseCasePort<
+  SearchPromptsInput,
+  SearchPromptsOutput
+> {}

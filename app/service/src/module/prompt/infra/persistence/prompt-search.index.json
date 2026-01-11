@@ -20,6 +20,25 @@
               "analyzer": "lucene.standard"
             }
           }
+        },
+        "category": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "stringFacet"
+          }
+        ],
+        "tags": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "stringFacet"
+          }
+        ],
+        "archivedAt": {
+          "type": "date"
         }
       }
     }

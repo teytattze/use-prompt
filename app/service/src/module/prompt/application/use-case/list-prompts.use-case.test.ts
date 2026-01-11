@@ -1,9 +1,11 @@
 import { describe, expect, it } from "bun:test";
 import { err, ok } from "neverthrow";
-import type { AppContext } from "@/shared/core/app-context";
-import { AppError } from "@/shared/core/app-error";
+import type { PromptDtoMapper } from "@/module/prompt/application/mapper/prompt-dto.mapper";
 import type { PromptAggregate } from "@/module/prompt/domain/aggregate/prompt.aggregate";
 import type { PromptRepositoryPort } from "@/module/prompt/port/prompt-repository.port";
+import type { VoteRepositoryPort } from "@/module/vote/port/vote-repository.port";
+import type { AppContext } from "@/shared/core/app-context";
+import { AppError } from "@/shared/core/app-error";
 import { ListPromptsUseCase } from "./list-prompts.use-case";
 
 describe("ListPromptsUseCase", () => {
@@ -21,16 +23,62 @@ describe("ListPromptsUseCase", () => {
   ) =>
     ({
       id,
-      props: { title, description, messages },
+      props: {
+        title,
+        description,
+        messages,
+        authorId: "test-author-id",
+        category: "coding",
+        tags: [],
+        createdAt: new Date(),
+        archivedAt: null,
+      },
     }) as unknown as PromptAggregate;
 
   const mockMapper = {
-    toDto: (aggregate: PromptAggregate) => ({
+    toDto: (aggregate: PromptAggregate, aura = 0) => ({
       id: aggregate.id,
       title: aggregate.props.title,
       description: aggregate.props.description,
       messages: aggregate.props.messages,
+      authorId: aggregate.props.authorId,
+      category: aggregate.props.category,
+      tags: aggregate.props.tags,
+      aura,
+      createdAt: aggregate.props.createdAt.toISOString(),
+      archivedAt: aggregate.props.archivedAt?.toISOString() ?? null,
     }),
+    toWithAuthorDto: () => ({}),
+    toSummaryDto: () => ({}),
+  } as unknown as PromptDtoMapper;
+
+  const createMockRepository = (
+    findManyResult: ReturnType<PromptRepositoryPort["findMany"]>,
+  ): PromptRepositoryPort => ({
+    insertOne: async () => ok({} as PromptAggregate),
+    findById: async () => ok(null),
+    findMany: async () => findManyResult,
+    search: async () => ok({ prompts: [], total: 0 }),
+    findByAuthor: async () => ok({ items: [], cursor: null, hasMore: false }),
+    updateArchivedAt: async () => ok(undefined),
+    findTrending: async () => ok({ items: [], cursor: null, hasMore: false }),
+    findRecent: async () => ok({ items: [], cursor: null, hasMore: false }),
+    searchByText: async () =>
+      ok({
+        items: [],
+        cursor: null,
+        hasMore: false,
+        facets: { categories: {}, tags: {} },
+      }),
+  });
+
+  const mockVoteRepository: VoteRepositoryPort = {
+    insertOne: async () => ok({} as never),
+    findByPromptAndUser: async () => ok(null),
+    updateOne: async () => ok({} as never),
+    deleteOne: async () => ok(undefined),
+    sumByPromptId: async () => ok(0),
+    sumByAuthorId: async () => ok(0),
   };
 
   describe("execute", () => {
@@ -42,16 +90,28 @@ describe("ListPromptsUseCase", () => {
         { type: "instruction", content: "Test Content 2", order: 0 },
       ];
 
-      const aggregate1 = createMockAggregate("1", "Test Title 1", "Description 1", messages1);
-      const aggregate2 = createMockAggregate("2", "Test Title 2", "Description 2", messages2);
+      const aggregate1 = createMockAggregate(
+        "1",
+        "Test Title 1",
+        "Description 1",
+        messages1,
+      );
+      const aggregate2 = createMockAggregate(
+        "2",
+        "Test Title 2",
+        "Description 2",
+        messages2,
+      );
 
-      const mockRepository: PromptRepositoryPort = {
-        insertOne: async () => ok(aggregate1),
-        findMany: async () => ok([aggregate1, aggregate2]),
-        search: async () => ok({ prompts: [], total: 0 }),
-      };
+      const mockRepository = createMockRepository(
+        Promise.resolve(ok([aggregate1, aggregate2])),
+      );
 
-      const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
+      const useCase = new ListPromptsUseCase(
+        mockMapper,
+        mockRepository,
+        mockVoteRepository,
+      );
       const result = await useCase.execute(mockCtx, undefined);
 
       expect(result.isOk()).toBe(true);
@@ -65,13 +125,13 @@ describe("ListPromptsUseCase", () => {
     });
 
     it("should return empty array when no prompts exist", async () => {
-      const mockRepository: PromptRepositoryPort = {
-        insertOne: async () => ok({} as PromptAggregate),
-        findMany: async () => ok([]),
-        search: async () => ok({ prompts: [], total: 0 }),
-      };
+      const mockRepository = createMockRepository(Promise.resolve(ok([])));
 
-      const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
+      const useCase = new ListPromptsUseCase(
+        mockMapper,
+        mockRepository,
+        mockVoteRepository,
+      );
       const result = await useCase.execute(mockCtx, undefined);
 
       expect(result.isOk()).toBe(true);
@@ -82,13 +142,15 @@ describe("ListPromptsUseCase", () => {
 
     it("should return error when repository fails", async () => {
       const mockError = AppError.from("unknown");
-      const mockRepository: PromptRepositoryPort = {
-        insertOne: async () => err(mockError),
-        findMany: async () => err(mockError),
-        search: async () => err(mockError),
-      };
+      const mockRepository = createMockRepository(
+        Promise.resolve(err(mockError)),
+      );
 
-      const useCase = new ListPromptsUseCase(mockMapper, mockRepository);
+      const useCase = new ListPromptsUseCase(
+        mockMapper,
+        mockRepository,
+        mockVoteRepository,
+      );
       const result = await useCase.execute(mockCtx, undefined);
 
       expect(result.isErr()).toBe(true);

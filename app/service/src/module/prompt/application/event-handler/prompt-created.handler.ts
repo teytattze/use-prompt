@@ -1,8 +1,8 @@
 import { type Result, ok } from "neverthrow";
-import type { AppContext } from "@/shared/core/app-context";
-import type { AppError } from "@/shared/core/app-error";
 import type { PromptCreatedEvent } from "@/module/prompt/domain/event/prompt-created.event";
 import type { PromptCreatedHandlerPort } from "@/module/prompt/port/prompt-created-handler.port";
+import type { AppContext } from "@/shared/core/app-context";
+import type { AppError } from "@/shared/core/app-error";
 
 export class PromptCreatedHandler implements PromptCreatedHandlerPort {
   async handle(

@@ -1,5 +1,5 @@
-import { BaseDomainEntity } from "@/shared/domain/base-entity";
 import type { BaseDomainEvent } from "@/shared/domain/base-domain-event";
+import { BaseDomainEntity } from "@/shared/domain/base-entity";
 import type { BaseProps } from "@/shared/domain/base-props";
 
 export class BaseDomainAggregate<
