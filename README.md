@@ -24,24 +24,24 @@ bun run dev
 
 ## Apps and Packages
 
-| Package              | Description                          |
-| -------------------- | ------------------------------------ |
-| `app/service`        | Backend API (Elysia + MongoDB)       |
-| `app/web`            | Frontend (Next.js + React)           |
-| `packages/eslint-config` | Shared ESLint configuration      |
+| Package                      | Description                     |
+| ---------------------------- | ------------------------------- |
+| `app/service`                | Backend API (Elysia + MongoDB)  |
+| `app/web`                    | Frontend (Next.js + React)      |
+| `packages/eslint-config`     | Shared ESLint configuration     |
 | `packages/typescript-config` | Shared TypeScript configuration |
 
 ## Commands
 
-| Command               | Description                          |
-| --------------------- | ------------------------------------ |
-| `bun install`         | Install dependencies                 |
-| `bun run dev`         | Start all apps in development mode   |
-| `bun run build`       | Build all apps for production        |
-| `bun run check-types` | Run TypeScript type checking         |
-| `bun run lint`        | Run ESLint                           |
-| `bun run test`        | Run tests                            |
-| `bun run format`      | Format code with Prettier            |
+| Command               | Description                        |
+| --------------------- | ---------------------------------- |
+| `bun install`         | Install dependencies               |
+| `bun run dev`         | Start all apps in development mode |
+| `bun run build`       | Build all apps for production      |
+| `bun run check-types` | Run TypeScript type checking       |
+| `bun run lint`        | Run ESLint                         |
+| `bun run test`        | Run tests                          |
+| `bun run format`      | Format code with Prettier          |
 
 ### Target Specific Apps
 

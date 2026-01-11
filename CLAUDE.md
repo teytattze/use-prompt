@@ -104,18 +104,18 @@ shared/ → (nothing)
 
 ### Naming Conventions
 
-| Type       | Pattern                      | Example                        |
-| ---------- | ---------------------------- | ------------------------------ |
-| Aggregate  | `{name}.aggregate.ts`        | `prompt.aggregate.ts`          |
-| Entity     | `{name}.entity.ts`           | `message.entity.ts`            |
-| Event      | `{name}.event.ts`            | `prompt-created.event.ts`      |
-| Port       | `{name}.port.ts`             | `prompt-repository.port.ts`    |
-| Use Case   | `{name}.use-case.ts`         | `create-prompt.use-case.ts`    |
-| Handler    | `{name}.handler.ts`          | `prompt-created.handler.ts`    |
-| Repository | `{name}.repository.ts`       | `prompt-mongo.repository.ts`   |
-| Mapper     | `{name}.mapper.ts`           | `prompt-dto.mapper.ts`         |
-| DTO        | `{name}.dto.ts`              | `prompt.dto.ts`                |
-| Router     | `{name}.router.ts`           | `prompt.router.ts`             |
+| Type       | Pattern                | Example                      |
+| ---------- | ---------------------- | ---------------------------- |
+| Aggregate  | `{name}.aggregate.ts`  | `prompt.aggregate.ts`        |
+| Entity     | `{name}.entity.ts`     | `message.entity.ts`          |
+| Event      | `{name}.event.ts`      | `prompt-created.event.ts`    |
+| Port       | `{name}.port.ts`       | `prompt-repository.port.ts`  |
+| Use Case   | `{name}.use-case.ts`   | `create-prompt.use-case.ts`  |
+| Handler    | `{name}.handler.ts`    | `prompt-created.handler.ts`  |
+| Repository | `{name}.repository.ts` | `prompt-mongo.repository.ts` |
+| Mapper     | `{name}.mapper.ts`     | `prompt-dto.mapper.ts`       |
+| DTO        | `{name}.dto.ts`        | `prompt.dto.ts`              |
+| Router     | `{name}.router.ts`     | `prompt.router.ts`           |
 
 ### Key Patterns
 

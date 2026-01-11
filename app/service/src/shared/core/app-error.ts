@@ -13,6 +13,26 @@ const appErrorDetails = {
     message: "Forbidden",
     status: 403,
   },
+  not_found: {
+    message: "Resource not found",
+    status: 404,
+  },
+  conflict: {
+    message: "Resource conflict",
+    status: 409,
+  },
+  bad_request: {
+    message: "Bad request",
+    status: 400,
+  },
+  self_vote: {
+    message: "Cannot vote on own prompt",
+    status: 400,
+  },
+  prompt_archived: {
+    message: "Action not allowed on archived prompt",
+    status: 400,
+  },
 } as const satisfies Record<string, { status: number; message: string }>;
 
 type AppErrorDetails = typeof appErrorDetails;

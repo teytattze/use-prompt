@@ -1,5 +1,5 @@
-import type { BaseProps } from "@/shared/domain/base-props";
 import { type Id } from "@/shared/core/id";
+import type { BaseProps } from "@/shared/domain/base-props";
 
 export class BaseDomainEntity<T extends BaseProps = BaseProps> {
   id: Id;
